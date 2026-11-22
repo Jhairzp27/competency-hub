@@ -252,7 +252,7 @@ code,
   grid-template-columns: 1fr;
 }
 
-/* Pantallas centradas (login, registro, recuperación) */
+/* Pantallas de autenticación (login, registro, recuperación) */
 .auth-layout {
   flex: 1;
   display: grid;
@@ -260,9 +260,134 @@ code,
   padding: var(--space-xl) var(--space-md);
 }
 
-.auth-layout .card {
+.auth-shell {
+  display: grid;
+  grid-template-columns: 1fr;
   width: 100%;
   max-width: 440px;
+  overflow: hidden;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+/* Panel de marca: solo en pantallas grandes */
+.auth-aside {
+  display: none;
+}
+
+.auth-panel {
+  padding: var(--space-lg);
+}
+
+.auth-header {
+  margin-bottom: var(--space-lg);
+}
+
+.auth-header p {
+  margin-top: var(--space-xs);
+  color: var(--color-muted-foreground);
+}
+
+.auth-header .auth-header-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-md);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.auth-panel .alert {
+  margin-bottom: var(--space-lg);
+}
+
+.auth-switch {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+  text-align: center;
+}
+
+.auth-switch a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* Fila de label + enlace secundario (ej. «¿Olvidaste tu contraseña?») */
+.form-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-md);
+}
+
+.form-label-row a {
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 768px) {
+  .auth-panel {
+    padding: var(--space-2xl) var(--space-xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  .auth-shell {
+    max-width: 960px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .auth-aside {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-xl);
+    padding: var(--space-2xl) var(--space-xl);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .auth-aside h2 {
+    color: var(--color-on-primary);
+    font-size: var(--text-xl);
+  }
+
+  .auth-aside p {
+    margin-top: var(--space-sm);
+    color: var(--color-muted);
+  }
+
+  .auth-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: 0;
+  }
+
+  .auth-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .auth-features .icon {
+    margin-top: 2px;
+    color: var(--color-accent-soft);
+  }
+
+  .auth-aside-footer {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -465,6 +590,68 @@ select.form-control {
   display: none;
 }
 
+/* Resumen de errores al enviar (lo crea /js/form-validation.js) */
+.error-summary:focus {
+  outline: 2px solid var(--color-destructive);
+  outline-offset: 2px;
+}
+
+.error-summary a {
+  color: var(--color-destructive-hover);
+  font-weight: 500;
+}
+
+/* Requisitos de contraseña en vivo (partials/password-checklist.ejs) */
+.password-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0;
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+}
+
+.password-checklist li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: color var(--duration-fast) ease;
+}
+
+.check-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.password-checklist li.is-met {
+  color: var(--color-success);
+}
+
+.password-checklist li.is-met .check-icon {
+  border-color: var(--color-success);
+  background-color: var(--color-success);
+}
+
+/* Marca de verificación dibujada con CSS (sin depender del color: cambia la forma) */
+.password-checklist li.is-met .check-icon::after {
+  content: '';
+  width: 4px;
+  height: 7px;
+  margin-top: -2px;
+  border: solid var(--color-on-accent);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;
@@ -515,6 +702,104 @@ select.form-control {
   color: inherit;
   border-color: var(--color-accent);
   box-shadow: var(--shadow-md);
+}
+
+/* --------------------------------------------------------------------------
+   Dashboard (pantalla principal)
+   -------------------------------------------------------------------------- */
+.dashboard {
+  display: grid;
+  gap: var(--space-lg);
+  grid-template-columns: 1fr;
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  height: 100%;
+}
+
+.action-card-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.action-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+}
+
+.action-card-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.action-card-text {
+  color: var(--color-muted-foreground);
+}
+
+.action-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.action-card-cta .icon {
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.action-card:hover .action-card-cta .icon {
+  transform: translateX(3px);
+}
+
+.account-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-lg);
+}
+
+.account-list {
+  display: grid;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.account-list dt {
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+}
+
+.account-list dd {
+  margin: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.account-note {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+}
+
+@media (min-width: 1024px) {
+  .dashboard {
+    grid-template-columns: 1fr 320px;
+    align-items: start;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -1509,7 +1794,6 @@ select.form-control {
 @media (min-width: 768px) {
   .container { padding-inline: var(--space-lg); }
   .main { padding-block: var(--space-2xl); }
-  .auth-layout .card { padding: var(--space-xl); }
 }
 
 @media (min-width: 1024px) {

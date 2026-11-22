@@ -1,0 +1,78 @@
+<%#
+  Partial: formulario de skill (crear y editar). Sigue el patrón de formularios del UI kit.
+  Variables (ver localsFormulario en src/modules/skills/skills.validation.js):
+    - action:      URL del POST (p. ej. '/skills' o '/skills/5/editar')
+    - submitLabel: texto del botón (p. ej. 'Crear skill')
+    - cancelUrl:   a dónde vuelve «Cancelar»
+    - old:         valores a mostrar en los campos (lo que escribió el usuario o la skill actual)
+    - errors:      lista de errores (para el resumen superior)
+    - fieldErrors: { campo: 'mensaje' } para mostrar cada error junto a su campo
+    - CATEGORIAS, IMPORTANCIAS, LIMITES: valores permitidos y límites
+  La validación en el cliente (required, maxlength, etc.) la agrega Daniel; el servidor valida siempre.
+%>
+<%
+  const valor = (campo) => (old && old[campo] != null ? old[campo] : '');
+  const errorDe = (campo) => (fieldErrors && fieldErrors[campo]) || '';
+  const describedBy = (campo, hint) => [hint ? `skill-${campo}-hint` : null, errorDe(campo) ? `skill-${campo}-error` : null].filter(Boolean).join(' ');
+%>
+<% if (errors && errors.length) { %>
+  <%- include('../partials/alert', { type: 'error', title: 'Revisa los datos del formulario', messages: errors }) %>
+<% } %>
+
+<form class="form" action="<%= action %>" method="POST" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <div class="form-group">
+    <label class="form-label" for="skill-nombre">Nombre<span class="required" aria-hidden="true">*</span></label>
+    <input class="form-control" id="skill-nombre" name="nombre" type="text" value="<%= valor('nombre') %>"
+      aria-describedby="<%= describedBy('nombre', true) %>"<% if (errorDe('nombre')) { %> aria-invalid="true"<% } %>>
+    <span class="form-hint" id="skill-nombre-hint">Entre <%= LIMITES.nombre.min %> y <%= LIMITES.nombre.max %> caracteres. Ej. Node.js</span>
+    <span class="form-error" id="skill-nombre-error"><%= errorDe('nombre') %></span>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="skill-categoria">Categoría<span class="required" aria-hidden="true">*</span></label>
+    <select class="form-control" id="skill-categoria" name="categoria"
+      aria-describedby="<%= describedBy('categoria', false) %>"<% if (errorDe('categoria')) { %> aria-invalid="true"<% } %>>
+      <option value="">Selecciona…</option>
+      <% CATEGORIAS.forEach((c) => { %>
+        <option value="<%= c.value %>"<%= valor('categoria') === c.value ? ' selected' : '' %>><%= c.label %></option>
+      <% }) %>
+    </select>
+    <span class="form-error" id="skill-categoria-error"><%= errorDe('categoria') %></span>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="skill-nivelEsperado">Nivel esperado<span class="required" aria-hidden="true">*</span></label>
+    <input class="form-control" id="skill-nivelEsperado" name="nivelEsperado" type="number" step="1"
+      min="<%= LIMITES.nivelEsperado.min %>" max="<%= LIMITES.nivelEsperado.max %>" value="<%= valor('nivelEsperado') %>"
+      aria-describedby="<%= describedBy('nivelEsperado', true) %>"<% if (errorDe('nivelEsperado')) { %> aria-invalid="true"<% } %>>
+    <span class="form-hint" id="skill-nivelEsperado-hint">Número entero del <%= LIMITES.nivelEsperado.min %> al <%= LIMITES.nivelEsperado.max %>.</span>
+    <span class="form-error" id="skill-nivelEsperado-error"><%= errorDe('nivelEsperado') %></span>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="skill-importancia">Importancia<span class="required" aria-hidden="true">*</span></label>
+    <select class="form-control" id="skill-importancia" name="importancia"
+      aria-describedby="<%= describedBy('importancia', false) %>"<% if (errorDe('importancia')) { %> aria-invalid="true"<% } %>>
+      <option value="">Selecciona…</option>
+      <% IMPORTANCIAS.forEach((i) => { %>
+        <option value="<%= i.value %>"<%= valor('importancia') === i.value ? ' selected' : '' %>><%= i.label %></option>
+      <% }) %>
+    </select>
+    <span class="form-error" id="skill-importancia-error"><%= errorDe('importancia') %></span>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="skill-descripcion">Descripción<span class="required" aria-hidden="true">*</span></label>
+    <textarea class="form-control" id="skill-descripcion" name="descripcion" rows="4"
+      aria-describedby="<%= describedBy('descripcion', true) %>"<% if (errorDe('descripcion')) { %> aria-invalid="true"<% } %>><%= valor('descripcion') %></textarea>
+    <span class="form-hint" id="skill-descripcion-hint">Entre <%= LIMITES.descripcion.min %> y <%= LIMITES.descripcion.max %> caracteres.</span>
+    <span class="form-error" id="skill-descripcion-error"><%= errorDe('descripcion') %></span>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit"><%= submitLabel %></button>
+    <a class="btn btn-secondary" href="<%= cancelUrl %>">Cancelar</a>
+  </div>
+</form>

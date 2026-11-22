@@ -1,15 +1,57 @@
-<%- include('partials/head', { title: 'Inicio' }) %>
+<%- include('partials/head', { title: 'Inicio', description: 'Pantalla principal de Competency Hub.' }) %>
 <main id="main" class="main">
-<div class="container">
-  <h1>Bienvenido, <%= currentUser.name %></h1>
-  <nav>
-    <a href="/skills">Catálogo de Skills (CRUD)</a> |
-    <a href="/chat">Chat en Tiempo Real</a>
-  </nav>
-  <form action="/auth/logout" method="POST" style="margin-top:20px;">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <button type="submit">Cerrar sesión</button>
-  </form>
-</div>
+  <div class="container">
+    <%- include('partials/flash') %>
+
+    <header class="page-header">
+      <div>
+        <h1>Hola, <%= currentUser.name %></h1>
+        <p>¿Qué quieres hacer hoy?</p>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      <nav class="grid grid-2 dashboard-actions" aria-label="Accesos principales">
+        <a class="card card-link action-card" href="/skills">
+          <span class="action-card-icon"><%- include('partials/icon', { name: 'list-checks', size: 28, label: null }) %></span>
+          <span class="action-card-body">
+            <span class="action-card-title">Catálogo de skills</span>
+            <span class="action-card-text">Busca, crea, edita y elimina las competencias técnicas y conductuales del equipo.</span>
+          </span>
+          <span class="action-card-cta">Ir al catálogo <%- include('partials/icon', { name: 'arrow-right', size: 18, label: null }) %></span>
+        </a>
+
+        <a class="card card-link action-card" href="/chat">
+          <span class="action-card-icon"><%- include('partials/icon', { name: 'message', size: 28, label: null }) %></span>
+          <span class="action-card-body">
+            <span class="action-card-title">Chat del equipo</span>
+            <span class="action-card-text">Conversa en tiempo real, mira quién está conectado y recibe avisos de cambios en el catálogo.</span>
+          </span>
+          <span class="action-card-cta">Abrir el chat <%- include('partials/icon', { name: 'arrow-right', size: 18, label: null }) %></span>
+        </a>
+      </nav>
+
+      <section class="card account-card" aria-labelledby="account-title">
+        <h2 id="account-title" class="account-title">
+          <%- include('partials/icon', { name: 'user', label: null }) %> Tu cuenta
+        </h2>
+        <dl class="account-list">
+          <div>
+            <dt>Nombre</dt>
+            <dd><%= currentUser.name %></dd>
+          </div>
+          <div>
+            <dt>Correo</dt>
+            <dd><%= currentUser.email %></dd>
+          </div>
+          <div>
+            <dt>Rol</dt>
+            <dd><span class="badge"><%= currentUser.role === 'ADMIN' ? 'Administrador' : 'Usuario' %></span></dd>
+          </div>
+        </dl>
+        <p class="account-note">Para cerrar sesión usa el botón del menú superior.</p>
+      </section>
+    </div>
+  </div>
 </main>
 <%- include('partials/footer') %>

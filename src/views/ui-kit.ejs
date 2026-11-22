@@ -47,19 +47,30 @@ res.redirect('/skills');
 
     <section class="kit-section card" aria-labelledby="kit-forms">
       <h2 id="kit-forms">Formularios</h2>
-      <p>Label siempre visible, ayuda debajo y error junto al campo con <code>aria-invalid</code>.</p>
-      <form class="form" novalidate>
+      <p>Label siempre visible, ayuda debajo y error junto al campo. Con <code>data-validate</code> y <code>/js/form-validation.js</code> las reglas se leen de los atributos HTML. Prueba a enviar vacío o con datos inválidos.</p>
+      <form class="form" action="/ui-kit/flash" method="GET" data-validate>
         <div class="form-group">
           <label class="form-label" for="kit-name">Nombre de la skill<span class="required" aria-hidden="true">*</span></label>
-          <input class="form-control" id="kit-name" type="text" placeholder="Ej. Node.js" aria-describedby="kit-name-hint">
-          <span class="form-hint" id="kit-name-hint">Entre 3 y 100 caracteres.</span>
+          <input class="form-control" id="kit-name" name="nombre" type="text" placeholder="Ej. Node.js"
+            required minlength="2" maxlength="80" aria-describedby="kit-name-hint"
+            data-msg-required="El nombre de la skill es obligatorio.">
+          <span class="form-hint" id="kit-name-hint">Entre 2 y 80 caracteres.</span>
         </div>
         <div class="form-group">
-          <label class="form-label" for="kit-level">Nivel esperado<span class="required" aria-hidden="true">*</span></label>
-          <input class="form-control" id="kit-level" type="number" value="7" aria-invalid="true" aria-describedby="kit-level-error">
-          <span class="form-error" id="kit-level-error">El nivel esperado debe ser un número del 1 al 5.</span>
+          <label class="form-label" for="kit-level">Nivel esperado (1 a 5)<span class="required" aria-hidden="true">*</span></label>
+          <input class="form-control" id="kit-level" name="nivel" type="number" inputmode="numeric" value="7"
+            required min="1" max="5" step="1" data-rule-integer>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Validar y enviar</button>
         </div>
       </form>
+      <code class="kit-code">&lt;form ... data-validate&gt;
+  &lt;input name="nombre" required minlength="2" maxlength="80"
+    data-msg-required="El nombre de la skill es obligatorio."&gt;
+  &lt;input name="nivel" type="number" required min="1" max="5" data-rule-integer&gt;
+&lt;/form&gt;
+&lt;%- include('../partials/footer', { scripts: ['/js/form-validation.js'] }) %&gt;</code>
     </section>
     <section class="kit-section" aria-labelledby="kit-list">
       <h2 id="kit-list">Listado: búsqueda, tabla, nivel y paginación</h2>
@@ -204,4 +215,4 @@ socket.on('skill:created', (skill) =&gt; {
   </div>
 </main>
 <%- include('partials/confirm-dialog') %>
-<%- include('partials/footer', { scripts: ['/js/confirm-dialog.js', '/js/chat-ui.js', '/js/ui-kit.js'] }) %>
+<%- include('partials/footer', { scripts: ['/js/form-validation.js', '/js/confirm-dialog.js', '/js/chat-ui.js', '/js/ui-kit.js'] }) %>
