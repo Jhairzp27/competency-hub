@@ -1,3 +1,54 @@
+# --- Dependencias ---
 node_modules/
+
+# --- Variables de entorno y secretos (solo se sube .env.example) ---
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+
+# --- Prisma ---
 /generated/prisma
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+
+# --- Pruebas y cobertura ---
+coverage/
+.nyc_output/
+
+# --- Lighthouse CI (los informes finales se guardan en docs/) ---
+.lighthouseci/
+
+# --- Bases de datos locales y respaldos ---
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.bak
+*.sql.gz
+
+# --- Sistema operativo ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editores e IDEs ---
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+
+# --- Configuración local de herramientas de IA ---
+.claude/settings.local.json
+
+# --- Temporales ---
+tmp/
+*.tmp
