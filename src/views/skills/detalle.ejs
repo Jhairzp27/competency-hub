@@ -36,6 +36,13 @@
         <dd><time datetime="<%= skill.updatedAt.toISOString() %>"><%= formatearFecha(skill.updatedAt) %></time></dd>
       </div>
     </dl>
+
+    <div class="cluster">
+      <a class="btn btn-primary" href="/skills/<%= skill.id %>/editar">
+        <%- include('../partials/icon', { name: 'pencil', label: null }) %>
+        <span>Editar</span>
+      </a>
+    </div>
   </article>
 </div>
 </main>

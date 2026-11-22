@@ -19,6 +19,17 @@ router.post(
   skillsController.crear
 );
 
-router.get('/:id', skillsController.detalle);
+// Rutas de una skill concreta: cargarSkill valida el id y responde 404 si no existe
+router.get('/:id', skillsController.cargarSkill, skillsController.detalle);
+
+router.get('/:id/editar', skillsController.cargarSkill, skillsController.formularioEditar);
+router.post(
+  '/:id/editar',
+  skillsController.cargarSkill,
+  skillValidator,
+  nombreUnicoValidator, // excluye la propia skill (req.params.id)
+  manejarErroresValidacion('skills/editar', skillsController.localsEditar),
+  skillsController.actualizar
+);
 
 module.exports = router;

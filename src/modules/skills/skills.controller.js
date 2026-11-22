@@ -62,12 +62,57 @@ exports.listar = async (req, res) => {
   res.render('skills/index', { ...helpersVista, ...resultado, query: filtros, hayFiltros });
 };
 
-// GET /skills/:id
-exports.detalle = async (req, res) => {
+// Middleware para las rutas /skills/:id...: valida el id, carga la skill en req.skill
+// y responde 404 si no existe (antes de validar formularios o tocar datos).
+exports.cargarSkill = async (req, res, next) => {
   const id = leerId(req.params.id);
   const skill = id && (await skillService.obtenerPorId(id));
   if (!skill) return skillNoEncontrada(res);
-  res.render('skills/detalle', { ...helpersVista, skill });
+  req.skill = skill;
+  next();
+};
+
+// GET /skills/:id
+exports.detalle = (req, res) => {
+  res.render('skills/detalle', { ...helpersVista, skill: req.skill });
+};
+
+// Datos de la vista "Editar skill" (también los usa el manejo de errores de validación).
+exports.localsEditar = (req) => ({
+  titulo: `Editar «${req.skill.nombre}»`,
+  action: `/skills/${req.skill.id}/editar`,
+  submitLabel: 'Guardar cambios',
+  cancelUrl: `/skills/${req.skill.id}`,
+});
+
+// GET /skills/:id/editar  (el formulario empieza con los valores actuales)
+exports.formularioEditar = (req, res) => {
+  res.render(
+    'skills/editar',
+    localsFormulario({ ...exports.localsEditar(req), old: valoresAnteriores(req.skill) })
+  );
+};
+
+// POST /skills/:id/editar  (llega aquí solo si pasó la validación)
+exports.actualizar = async (req, res) => {
+  try {
+    const skill = await skillService.actualizar(req.skill.id, req.skillData);
+    if (!skill) return skillNoEncontrada(res); // se eliminó mientras se editaba
+    req.session.flash = { type: 'success', message: `Se actualizó la skill «${skill.nombre}».` };
+    return res.redirect(`/skills/${skill.id}`);
+  } catch (err) {
+    const fieldErrors = errorPrismaACampos(err);
+    if (!fieldErrors) throw err;
+    return res.status(400).render(
+      'skills/editar',
+      localsFormulario({
+        ...exports.localsEditar(req),
+        errors: Object.values(fieldErrors).map((msg) => ({ msg })),
+        fieldErrors,
+        old: valoresAnteriores(req.body),
+      })
+    );
+  }
 };
 
 // Datos de la vista "Nueva skill" (también los usa el manejo de errores de validación).
