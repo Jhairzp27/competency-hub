@@ -13,13 +13,16 @@
       <%- include('../partials/alert', { type: 'info', title: 'Revisa tu correo', messages: message }) %>
       <%- include('../partials/alert', { type: 'error', title: 'No pudimos continuar', messages: errors }) %>
 
-      <form class="form" action="/auth/forgot" method="POST">
+      <form class="form" action="/auth/forgot" method="POST" data-validate>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
         <div class="form-group">
           <label class="form-label" for="email">Correo electrónico</label>
           <input class="form-control" id="email" name="email" type="email"
-            autocomplete="email" placeholder="nombre@empresa.com" required>
+            autocomplete="email" placeholder="nombre@empresa.com" required maxlength="150"
+            data-msg-required="Ingresa tu correo electrónico."
+            data-msg-email="Ingresa un correo electrónico válido."
+            data-msg-maxlength="El correo debe tener como máximo 150 caracteres.">
         </div>
 
         <button class="btn btn-primary btn-block" type="submit">Enviar enlace de recuperación</button>
@@ -31,4 +34,4 @@
     </section>
   </div>
 </main>
-<%- include('../partials/footer') %>
+<%- include('../partials/footer', { scripts: ['/js/form-validation.js'] }) %>
