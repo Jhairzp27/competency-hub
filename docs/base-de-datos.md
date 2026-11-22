@@ -2,7 +2,7 @@
 
 - **Motor:** PostgreSQL 16 (contenedor `skillbridge_db`, ver `docker-compose.yml`).
 - **ORM:** Prisma 6 (`prisma/schema.prisma`). Los cambios se versionan como migraciones SQL en `prisma/migrations/`.
-- **Responsables:** tablas de autenticación (`users`, `password_reset_tokens`, `user_sessions`): Jhair. Tabla `skills`, índices de búsqueda y seed: Isaac.
+- **Responsables:** tablas de autenticación (`users`, `password_reset_tokens`, `user_sessions`): Jhair. Tabla `skills`, índices de búsqueda y seed: Isaac. Tabla `chat_messages` (historial del chat): Sergio.
 
 ## Diagrama del modelo de datos
 
@@ -10,6 +10,7 @@
 erDiagram
   users ||--o{ password_reset_tokens : "tiene"
   users |o--o{ skills : "crea (created_by_id)"
+  users ||--o{ chat_messages : "escribe"
 
   users {
     int id PK
@@ -37,6 +38,13 @@ erDiagram
     int created_by_id FK "nullable"
     timestamp created_at
     timestamp updated_at
+  }
+  chat_messages {
+    int id PK
+    varchar_500 content
+    varchar_50 room
+    int user_id FK
+    timestamp created_at
   }
   user_sessions {
     varchar sid PK
@@ -74,6 +82,24 @@ Las restricciones `CHECK` no las genera Prisma; están escritas a mano en `prism
 
 `skills.created_by_id` guarda qué usuario registró la skill (`req.session.user.id`). Es opcional porque las skills del seed no tienen autor. Si un usuario se elimina, sus skills se conservan y el campo pasa a `NULL` (`ON DELETE SET NULL`), porque el catálogo pertenece a la empresa y no a la persona.
 
+## Tabla `chat_messages` (historial del chat)
+
+Guarda cada mensaje enviado por WebSocket, para que el historial se conserve al recargar la página o al entrar más tarde.
+
+| Campo (Prisma) | Columna | Tipo | Restricciones |
+|---|---|---|---|
+| `id` | `id` | `SERIAL` | Clave primaria |
+| `content` | `content` | `VARCHAR(500)` | Obligatorio, 1–500 caracteres sin contar espacios extremos (CHECK `chat_messages_content_longitud`) |
+| `room` | `room` | `VARCHAR(50)` | Sala del mensaje; por defecto `general` (CHECK `chat_messages_room_longitud`, 1–50) |
+| `userId` | `user_id` | `INTEGER` | Obligatorio, FK a `users.id`; `ON DELETE CASCADE` |
+| `createdAt` | `created_at` | `TIMESTAMP(3)` | Por defecto `CURRENT_TIMESTAMP` |
+
+- El autor siempre se toma de la sesión del usuario autenticado en el handshake del WebSocket, nunca de lo que envía el cliente.
+- El límite de 500 caracteres es el mismo en el cliente (`maxlength="500"`), en la validación del servidor y en la BD.
+- `ON DELETE CASCADE`: los mensajes son datos personales de quien los escribió, así que si el usuario se elimina, sus mensajes también.
+- `room` deja preparado el modelo para más salas; por ahora solo se usa la sala `general`.
+- Las restricciones `CHECK` están escritas a mano en `prisma/migrations/20261122170000_chat_messages/migration.sql`.
+
 ## Índices
 
 | Índice | Columnas | Tipo | Para qué sirve |
@@ -83,6 +109,8 @@ Las restricciones `CHECK` no las genera Prisma; están escritas a mano en `prism
 | `skills_nombre_trgm_idx` | `nombre gin_trgm_ops` | **GIN de trigramas** | Búsqueda parcial e insensible a mayúsculas (`ILIKE '%texto%'`) |
 | `skills_categoria_importancia_idx` | `categoria, importancia` | B-tree compuesto | Filtro por categoría, o por categoría + importancia |
 | `skills_created_by_id_idx` | `created_by_id` | B-tree | Consultar las skills creadas por un usuario y acelerar la FK |
+| `chat_messages_room_created_at_idx` | `room, created_at` | B-tree compuesto | Cargar el historial de una sala en orden cronológico (últimos N mensajes) sin ordenar toda la tabla |
+| `chat_messages_user_id_idx` | `user_id` | B-tree | Acelerar la FK (el `CASCADE` al borrar un usuario) y las consultas por autor |
 
 ### ¿Por qué un índice de trigramas?
 

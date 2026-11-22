@@ -16,6 +16,7 @@ model User {
   createdAt    DateTime             @default(now()) @map("created_at")
   resetTokens  PasswordResetToken[]
   skills       Skill[]
+  chatMessages ChatMessage[]
 
   @@map("users")
 }
@@ -71,4 +72,22 @@ model Skill {
   // Filtros del listado: categoría sola o categoría + importancia
   @@index([categoria, importancia], map: "skills_categoria_importancia_idx")
   @@map("skills")
+}
+
+// ----- Módulo de Chat en tiempo real (Sergio) -----
+
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.VarChar(500)
+  room      String   @default("general") @db.VarChar(50)
+  userId    Int      @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Historial de una sala en orden cronológico (carga de los últimos N mensajes)
+  @@index([room, createdAt], map: "chat_messages_room_created_at_idx")
+  // Acelera la FK y las consultas de mensajes de un usuario
+  @@index([userId])
+  @@map("chat_messages")
 }

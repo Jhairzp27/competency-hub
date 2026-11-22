@@ -1,0 +1,49 @@
+<%- include('partials/head', { title: 'Chat', description: 'Sala general de chat en tiempo real del equipo de Competency Hub.' }) %>
+<main id="main" class="main">
+  <div class="container">
+    <%- include('partials/flash') %>
+
+    <div class="page-header">
+      <div>
+        <h1>Chat del equipo</h1>
+        <p>Conversa en tiempo real con las personas conectadas. Los mensajes quedan guardados en el historial.</p>
+      </div>
+    </div>
+
+    <div class="chat" data-chat data-user-id="<%= currentUser.id %>" data-max-length="<%= maxLength %>">
+      <section class="card chat-panel" aria-labelledby="chat-title">
+        <div class="chat-header">
+          <h2 id="chat-title">Sala general</h2>
+          <span class="badge badge-success"><span data-online-count>0</span>&nbsp;en línea</span>
+        </div>
+
+        <ul class="chat-messages" role="log" aria-live="polite" aria-label="Mensajes de la sala general" data-chat-messages>
+          <% if (messages.length === 0) { %>
+            <li class="chat-system" data-chat-empty>Aún no hay mensajes. Escribe el primero.</li>
+          <% } %>
+          <% messages.forEach((m) => { %>
+            <%- include('partials/chat-message', { message: m, own: m.userId === currentUser.id }) %>
+          <% }) %>
+        </ul>
+
+        <%# El formulario se habilita cuando el WebSocket se conecta (ver /js/chat.js) %>
+        <form class="chat-form" data-chat-form novalidate>
+          <div class="form-group">
+            <label class="sr-only" for="chat-input">Escribe un mensaje</label>
+            <textarea class="form-control" id="chat-input" name="content" rows="1" maxlength="<%= maxLength %>" placeholder="Conectando al chat…" required disabled></textarea>
+            <span class="chat-counter" data-chat-counter>0/<%= maxLength %></span>
+          </div>
+          <button class="btn btn-primary btn-icon" type="submit" aria-label="Enviar mensaje" disabled>
+            <%- include('partials/icon', { name: 'send', label: null }) %>
+          </button>
+        </form>
+      </section>
+
+      <aside class="card" aria-labelledby="online-title">
+        <h2 id="online-title" class="cluster"><%- include('partials/icon', { name: 'users', label: null }) %> Conectados</h2>
+        <ul class="online-users mt-md" data-online-users></ul>
+      </aside>
+    </div>
+  </div>
+</main>
+<%- include('partials/footer', { scripts: ['/js/chat-ui.js'] }) %>

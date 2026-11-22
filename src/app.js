@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const { sessionMiddleware } = require('./config/session');
 const { generateCsrfToken, verifyCsrfToken } = require('./middlewares/csrf.middleware');
 const authRoutes = require('./modules/auth/auth.routes');
+const chatRoutes = require('./modules/chat/chat.routes');
 const { requireAuth } = require('./middlewares/auth.middleware');
 
 const app = express();
@@ -41,6 +42,8 @@ app.use('/auth', authRoutes);
 app.get('/dashboard', requireAuth, (req, res) => {
   res.render('dashboard');
 });
+
+app.use('/chat', chatRoutes);
 
 // UI kit de referencia para el equipo (solo en desarrollo)
 if (process.env.NODE_ENV !== 'production') {
