@@ -1,4 +1,5 @@
-const { body } = require('express-validator');
+const { body, validationResult } = require('express-validator');
+const prisma = require('../../config/db');
 const { CATEGORIAS, IMPORTANCIAS, LIMITES } = require('./skills.constants');
 
 const valoresCategoria = CATEGORIAS.map((c) => c.value);
@@ -56,4 +57,24 @@ const skillValidator = [
     .not().matches(PATRON_CONTROL).withMessage('La descripción contiene caracteres no permitidos.'),
 ];
 
-module.exports = { skillValidator, PATRON_NOMBRE };
+// Nombre único sin distinguir mayúsculas ("React" y "react" se consideran el mismo).
+// La restricción UNIQUE de la BD distingue mayúsculas, por eso se comprueba aquí.
+// En la edición se excluye la propia skill (req.params.id).
+// Se omite si el nombre ya tiene otro error, para no consultar la BD en vano.
+const nombreUnicoValidator = body('nombre').custom(async (nombre, { req }) => {
+  if (typeof nombre !== 'string' || validationResult(req).array().some((e) => e.path === 'nombre')) {
+    return true;
+  }
+  const idActual = Number.parseInt(req.params?.id, 10);
+  const existente = await prisma.skill.findFirst({
+    where: {
+      nombre: { equals: nombre, mode: 'insensitive' },
+      ...(Number.isInteger(idActual) ? { NOT: { id: idActual } } : {}),
+    },
+    select: { id: true },
+  });
+  if (existente) throw new Error('Ya existe una skill con ese nombre.');
+  return true;
+});
+
+module.exports = { skillValidator, nombreUnicoValidator, PATRON_NOMBRE };
