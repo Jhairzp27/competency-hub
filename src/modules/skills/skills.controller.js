@@ -115,6 +115,20 @@ exports.actualizar = async (req, res) => {
   }
 };
 
+// GET /skills/:id/eliminar  (página de confirmación; con JavaScript se usa el modal)
+exports.confirmarEliminar = (req, res) => {
+  res.render('skills/eliminar', { ...helpersVista, skill: req.skill });
+};
+
+// POST /skills/:id/eliminar
+exports.eliminar = async (req, res) => {
+  const eliminada = await skillService.eliminar(req.skill.id);
+  req.session.flash = eliminada
+    ? { type: 'success', message: `Se eliminó la skill «${eliminada.nombre}».` }
+    : { type: 'info', message: 'La skill ya había sido eliminada.' };
+  res.redirect('/skills');
+};
+
 // Datos de la vista "Nueva skill" (también los usa el manejo de errores de validación).
 exports.localsNueva = () => ({
   titulo: 'Nueva skill',

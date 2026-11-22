@@ -42,8 +42,18 @@
         <%- include('../partials/icon', { name: 'pencil', label: null }) %>
         <span>Editar</span>
       </a>
+      <a class="btn btn-danger" href="/skills/<%= skill.id %>/eliminar"
+        data-confirm
+        data-confirm-action="/skills/<%= skill.id %>/eliminar"
+        data-confirm-title="¿Eliminar la skill «<%= skill.nombre %>»?"
+        data-confirm-message="Se eliminará del catálogo. Esta acción no se puede deshacer."
+        data-confirm-label="Eliminar">
+        <%- include('../partials/icon', { name: 'trash', label: null }) %>
+        <span>Eliminar</span>
+      </a>
     </div>
   </article>
 </div>
 </main>
-<%- include('../partials/footer') %>
+<%- include('../partials/confirm-dialog') %>
+<%- include('../partials/footer', { scripts: ['/js/confirm-dialog.js'] }) %>

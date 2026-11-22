@@ -32,4 +32,8 @@ router.post(
   skillsController.actualizar
 );
 
+// Eliminar: siempre con confirmación (modal o página) y por POST con token CSRF
+router.get('/:id/eliminar', skillsController.cargarSkill, skillsController.confirmarEliminar);
+router.post('/:id/eliminar', skillsController.cargarSkill, skillsController.eliminar);
+
 module.exports = router;
