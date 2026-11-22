@@ -314,6 +314,12 @@ code,
   text-align: center;
 }
 
+.auth-switch a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
 /* Fila de label + enlace secundario (ej. «¿Olvidaste tu contraseña?») */
 .form-label-row {
   display: flex;
