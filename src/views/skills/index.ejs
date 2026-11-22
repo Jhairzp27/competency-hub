@@ -8,6 +8,39 @@
 
   <%- include('../partials/flash') %>
 
+  <%# Búsqueda y filtros: formulario GET, los filtros quedan en la URL y la paginación los conserva %>
+  <form class="toolbar" method="GET" action="/skills" role="search" aria-label="Buscar y filtrar skills">
+    <div class="form-group">
+      <label class="form-label" for="filtro-q">Buscar por nombre</label>
+      <div class="toolbar-search">
+        <%- include('../partials/icon', { name: 'search', size: 18, label: null }) %>
+        <input class="form-control" id="filtro-q" name="q" type="search" placeholder="Ej. Node.js" value="<%= query.q %>">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="filtro-categoria">Categoría</label>
+      <select class="form-control" id="filtro-categoria" name="categoria">
+        <option value="">Todas</option>
+        <% CATEGORIAS.forEach((c) => { %>
+          <option value="<%= c.value %>"<%= query.categoria === c.value ? ' selected' : '' %>><%= c.label %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="filtro-importancia">Importancia</label>
+      <select class="form-control" id="filtro-importancia" name="importancia">
+        <option value="">Todas</option>
+        <% IMPORTANCIAS.forEach((i) => { %>
+          <option value="<%= i.value %>"<%= query.importancia === i.value ? ' selected' : '' %>><%= i.label %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn btn-primary" type="submit">Buscar</button>
+      <% if (hayFiltros) { %><a class="btn btn-ghost" href="/skills">Limpiar</a><% } %>
+    </div>
+  </form>
+
   <% if (items.length) { %>
     <div class="table-wrapper">
       <table class="table">
@@ -45,7 +78,11 @@
       <div class="empty-state">
         <%- include('../partials/icon', { name: 'search', size: 40, label: null }) %>
         <h3>No se encontraron skills</h3>
-        <p>Todavía no hay skills en el catálogo.</p>
+        <% if (hayFiltros) { %>
+          <p>Prueba con otro nombre o <a href="/skills">limpia los filtros</a>.</p>
+        <% } else { %>
+          <p>Todavía no hay skills en el catálogo.</p>
+        <% } %>
       </div>
     </div>
   <% } %>
