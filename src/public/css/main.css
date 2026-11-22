@@ -1423,6 +1423,46 @@ select.form-control {
 }
 
 /* --------------------------------------------------------------------------
+   Páginas de error (404, 500)
+   -------------------------------------------------------------------------- */
+.error-page {
+  display: grid;
+  place-items: center;
+}
+
+.error-card {
+  max-width: 560px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.error-code {
+  font-family: var(--font-mono);
+  font-size: clamp(4rem, 18vw, 7rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-accent);
+  letter-spacing: -0.04em;
+}
+
+.error-card h1 {
+  margin-top: var(--space-md);
+}
+
+.error-message {
+  margin-top: var(--space-sm);
+  color: var(--color-muted-foreground);
+}
+
+.error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+}
+
+/* --------------------------------------------------------------------------
    UI kit (página de referencia solo en desarrollo)
    -------------------------------------------------------------------------- */
 .kit-section + .kit-section {

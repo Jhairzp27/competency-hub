@@ -143,6 +143,15 @@ res.redirect('/skills');
   data-confirm-title="¿Eliminar la skill «&lt;%= skill.name %&gt;»?"&gt;Eliminar&lt;/button&gt;</code>
     </section>
 
+    <section class="kit-section card" aria-labelledby="kit-errors">
+      <h2 id="kit-errors">Páginas de error</h2>
+      <p>Vista <code>errors/error</code>. El detalle técnico solo se registra en la consola del servidor.</p>
+      <div class="cluster">
+        <a class="btn btn-secondary" href="/ruta-que-no-existe">Ver página 404</a>
+        <a class="btn btn-secondary" href="/ui-kit/error-demo">Ver página 500</a>
+      </div>
+    </section>
+
     <section class="kit-section" aria-labelledby="kit-toast">
       <h2 id="kit-toast">Notificaciones (toast)</h2>
       <p><code>/js/toast.js</code> se carga en todas las páginas. Se cierran solas a los 4 segundos.</p>

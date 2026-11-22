@@ -47,4 +47,9 @@ router.post('/confirm-demo', (req, res) => {
   res.redirect('/ui-kit');
 });
 
+// Demostración de la página de error 500 (lanza un error a propósito)
+router.get('/error-demo', () => {
+  throw new Error('Error de demostración del UI kit');
+});
+
 module.exports = router;

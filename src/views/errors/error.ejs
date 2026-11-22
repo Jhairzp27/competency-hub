@@ -1,0 +1,28 @@
+<%#
+  Vista de error genérica (404, 500 y otros códigos).
+  Variables: status, heading, message
+  Nunca muestra detalles internos (stack, SQL): esos solo van a la consola del servidor.
+%>
+<%- include('../partials/head', { title: `Error ${status}`, description: heading }) %>
+<main id="main" class="main error-page">
+  <div class="container">
+    <div class="error-card">
+      <p class="error-code" aria-hidden="true"><%= status %></p>
+      <h1><%= heading %></h1>
+      <p class="error-message"><%= message %></p>
+      <div class="error-actions">
+        <a class="btn btn-primary" href="<%= locals.currentUser ? '/dashboard' : '/auth/login' %>">
+          <%- include('../partials/icon', { name: 'home', label: null }) %>
+          <%= locals.currentUser ? 'Ir al inicio' : 'Ir a iniciar sesión' %>
+        </a>
+        <% if (locals.currentUser) { %>
+          <a class="btn btn-secondary" href="/skills">
+            <%- include('../partials/icon', { name: 'list-checks', label: null }) %>
+            Ver catálogo de skills
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>
+<%- include('../partials/footer') %>
