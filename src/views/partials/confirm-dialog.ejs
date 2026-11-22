@@ -1,0 +1,28 @@
+<%#
+  Partial: modal de confirmación para acciones destructivas (un solo <dialog> por página).
+  1) Incluirlo una vez en la vista:   include('../partials/confirm-dialog')
+  2) Cargar el script en el footer:   include('../partials/footer', { scripts: ['/js/confirm-dialog.js'] })
+  3) En cada botón que deba confirmar:
+       <button type="button" class="btn btn-danger"
+         data-confirm
+         data-confirm-action="/skills/5/delete"
+         data-confirm-title="¿Eliminar la skill «Node.js»?"
+         data-confirm-message="Esta acción no se puede deshacer."
+         data-confirm-label="Eliminar">Eliminar</button>
+     Opcional: data-confirm-method="DELETE" agrega un campo oculto _method (para method-override).
+  Al confirmar se envía un POST con el token CSRF a data-confirm-action.
+%>
+<dialog class="dialog" id="confirm-dialog" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
+  <form class="dialog-content" method="POST" action="" data-confirm-form>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div class="dialog-icon"><%- include('icon', { name: 'alert-triangle', size: 24, label: null }) %></div>
+    <div class="dialog-body">
+      <h2 class="dialog-title" id="confirm-dialog-title">¿Confirmar acción?</h2>
+      <p class="dialog-message" id="confirm-dialog-message">Esta acción no se puede deshacer.</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" type="button" data-confirm-cancel>Cancelar</button>
+      <button class="btn btn-danger" type="submit" data-confirm-submit>Eliminar</button>
+    </div>
+  </form>
+</dialog>

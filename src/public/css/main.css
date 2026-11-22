@@ -815,6 +815,356 @@ select.form-control {
 }
 
 /* --------------------------------------------------------------------------
+   Barra de búsqueda y filtros (listados)
+   -------------------------------------------------------------------------- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.toolbar .form-group {
+  flex: 1 1 200px;
+}
+
+.toolbar-search {
+  position: relative;
+}
+
+.toolbar-search .icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-muted-foreground);
+  pointer-events: none;
+}
+
+.toolbar-search .form-control {
+  padding-left: 2.5rem;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Tabla
+   -------------------------------------------------------------------------- */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table caption {
+  padding: var(--space-md);
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.table th,
+.table td {
+  padding: 0.75rem var(--space-md);
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table thead th {
+  background-color: var(--color-muted);
+  color: var(--color-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  transition: background-color var(--duration-fast) ease;
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-background);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table .cell-title {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.table .cell-actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.table-actions {
+  display: inline-flex;
+  gap: var(--space-xs);
+}
+
+/* Botón compacto solo-icono (siempre con aria-label) */
+.btn-icon {
+  min-height: var(--touch-target);
+  min-width: var(--touch-target);
+  padding: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Badges y nivel
+   -------------------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.125rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background-color: var(--color-muted);
+  color: var(--color-secondary);
+}
+
+.badge-technical {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+}
+
+.badge-behavioral {
+  background-color: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.badge-high {
+  background-color: var(--color-destructive-soft);
+  color: var(--color-destructive-hover); /* más oscuro: contraste ≥ 4.5:1 sobre el fondo suave */
+}
+
+.badge-success {
+  background-color: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.level {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.level-dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.level-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-border);
+}
+
+.level-dot.is-filled {
+  background-color: var(--color-accent);
+}
+
+.level-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   Estado vacío (sin resultados)
+   -------------------------------------------------------------------------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) var(--space-md);
+  text-align: center;
+  color: var(--color-muted-foreground);
+}
+
+.empty-state .icon {
+  color: var(--color-border);
+}
+
+.empty-state h3 {
+  color: var(--color-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Paginación
+   -------------------------------------------------------------------------- */
+.pagination-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.pagination-summary {
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+}
+
+.pagination ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  list-style: none;
+  padding: 0;
+}
+
+.pagination-link,
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  padding: 0 0.75rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.pagination-link {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card);
+  color: var(--color-primary);
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.pagination-link:hover {
+  background-color: var(--color-muted);
+  color: var(--color-primary);
+}
+
+.pagination-link.is-current {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.pagination-link.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-ellipsis {
+  color: var(--color-muted-foreground);
+}
+
+/* En móvil solo se muestran las flechas, sin texto */
+.pagination-text {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .pagination-text {
+    display: inline;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Modal de confirmación (<dialog> nativo)
+   -------------------------------------------------------------------------- */
+.dialog {
+  width: min(480px, calc(100% - 2rem));
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xl);
+  background-color: var(--color-card);
+  color: var(--color-foreground);
+  box-shadow: var(--shadow-xl);
+}
+
+.dialog::backdrop {
+  background-color: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.dialog[open] {
+  animation: dialog-in var(--duration-base) var(--ease-out);
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.dialog-content {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+}
+
+.dialog-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-destructive-soft);
+  color: var(--color-destructive);
+}
+
+.dialog-title {
+  font-size: var(--text-lg);
+}
+
+.dialog-message {
+  margin-top: var(--space-xs);
+  color: var(--color-muted-foreground);
+}
+
+.dialog-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 640px) {
+  .dialog-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+/* --------------------------------------------------------------------------
    UI kit (página de referencia solo en desarrollo)
    -------------------------------------------------------------------------- */
 .kit-section + .kit-section {

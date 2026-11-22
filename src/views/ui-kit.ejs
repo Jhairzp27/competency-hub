@@ -61,6 +61,88 @@ res.redirect('/skills');
         </div>
       </form>
     </section>
+    <section class="kit-section" aria-labelledby="kit-list">
+      <h2 id="kit-list">Listado: búsqueda, tabla, nivel y paginación</h2>
+      <p>Base para el CRUD de skills. La búsqueda es un formulario <code>GET</code> (los filtros quedan en la URL).</p>
+
+      <form class="toolbar" method="GET" action="/ui-kit" role="search">
+        <div class="form-group">
+          <label class="form-label" for="kit-q">Buscar por nombre</label>
+          <div class="toolbar-search">
+            <%- include('partials/icon', { name: 'search', size: 18, label: null }) %>
+            <input class="form-control" id="kit-q" name="q" type="search" placeholder="Ej. Node.js" value="<%= query.q || '' %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="kit-category">Categoría</label>
+          <select class="form-control" id="kit-category" name="category">
+            <option value="">Todas</option>
+            <option value="TECNICA"<%= query.category === 'TECNICA' ? ' selected' : '' %>>Técnica</option>
+            <option value="CONDUCTUAL"<%= query.category === 'CONDUCTUAL' ? ' selected' : '' %>>Conductual</option>
+          </select>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-primary" type="submit">Buscar</button>
+          <a class="btn btn-ghost" href="/ui-kit">Limpiar</a>
+        </div>
+      </form>
+
+      <div class="table-wrapper">
+        <table class="table">
+          <caption class="sr-only">Skills de ejemplo</caption>
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Categoría</th>
+              <th scope="col">Nivel esperado</th>
+              <th scope="col">Importancia</th>
+              <th scope="col" class="cell-actions"><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sampleSkills.forEach((s) => { %>
+              <tr>
+                <td class="cell-title"><%= s.name %></td>
+                <td><span class="badge <%= s.category === 'TECNICA' ? 'badge-technical' : 'badge-behavioral' %>"><%= s.category === 'TECNICA' ? 'Técnica' : 'Conductual' %></span></td>
+                <td><%- include('partials/level', { level: s.level }) %></td>
+                <td><span class="badge<%= s.importance === 'Alta' ? ' badge-high' : '' %>"><%= s.importance %></span></td>
+                <td class="cell-actions">
+                  <div class="table-actions">
+                    <a class="btn btn-ghost btn-icon" href="/ui-kit" aria-label="Ver <%= s.name %>"><%- include('partials/icon', { name: 'eye', label: null }) %></a>
+                    <a class="btn btn-ghost btn-icon" href="/ui-kit" aria-label="Editar <%= s.name %>"><%- include('partials/icon', { name: 'pencil', label: null }) %></a>
+                    <button class="btn btn-ghost btn-icon" type="button" aria-label="Eliminar <%= s.name %>"
+                      data-confirm
+                      data-confirm-action="/ui-kit/confirm-demo"
+                      data-confirm-title="¿Eliminar la skill «<%= s.name %>»?"
+                      data-confirm-message="Se eliminará del catálogo. Esta acción no se puede deshacer."
+                      data-confirm-label="Eliminar"><%- include('partials/icon', { name: 'trash', label: null }) %></button>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <%- include('partials/pagination', { page: parseInt(query.page, 10) || 3, totalPages: 8, totalItems: 75, pageSize: 10, baseUrl: '/ui-kit', query }) %>
+
+      <div class="card mt-lg">
+        <div class="empty-state">
+          <%- include('partials/icon', { name: 'search', size: 40, label: null }) %>
+          <h3>No se encontraron skills</h3>
+          <p>Prueba con otro nombre o limpia los filtros.</p>
+        </div>
+      </div>
+
+      <code class="kit-code">&lt;%- include('../partials/level', { level: skill.expectedLevel }) %&gt;
+&lt;%- include('../partials/pagination', { page, totalPages, totalItems, pageSize, baseUrl: '/skills', query: { q, category } }) %&gt;
+
+&lt;!-- Botón eliminar: abre el modal (incluir partials/confirm-dialog y /js/confirm-dialog.js) --&gt;
+&lt;button type="button" class="btn btn-danger" data-confirm
+  data-confirm-action="/skills/&lt;%= skill.id %&gt;/delete"
+  data-confirm-title="¿Eliminar la skill «&lt;%= skill.name %&gt;»?"&gt;Eliminar&lt;/button&gt;</code>
+    </section>
   </div>
 </main>
-<%- include('partials/footer') %>
+<%- include('partials/confirm-dialog') %>
+<%- include('partials/footer', { scripts: ['/js/confirm-dialog.js'] }) %>
