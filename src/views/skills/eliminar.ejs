@@ -1,0 +1,20 @@
+<%# Confirmación de eliminación sin JavaScript (con JavaScript se usa el modal confirm-dialog). %>
+<%- include('../partials/head', { title: `Eliminar «${skill.nombre}»` }) %>
+<main id="main" class="main">
+<div class="container stack">
+  <p><a href="/skills/<%= skill.id %>">&larr; Volver al detalle</a></p>
+
+  <div class="card stack">
+    <%- include('../partials/alert', { type: 'warning', title: `¿Eliminar la skill «${skill.nombre}»?`, messages: 'Se eliminará del catálogo. Esta acción no se puede deshacer.' }) %>
+    <form method="POST" action="/skills/<%= skill.id %>/eliminar" class="cluster">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="btn btn-danger" type="submit">
+        <%- include('../partials/icon', { name: 'trash', label: null }) %>
+        <span>Sí, eliminar</span>
+      </button>
+      <a class="btn btn-secondary" href="/skills/<%= skill.id %>">Cancelar</a>
+    </form>
+  </div>
+</div>
+</main>
+<%- include('../partials/footer') %>

@@ -6,6 +6,7 @@ const { sessionMiddleware } = require('./config/session');
 const { generateCsrfToken, verifyCsrfToken } = require('./middlewares/csrf.middleware');
 const authRoutes = require('./modules/auth/auth.routes');
 const chatRoutes = require('./modules/chat/chat.routes');
+const skillsRoutes = require('./modules/skills/skills.routes');
 const { requireAuth } = require('./middlewares/auth.middleware');
 
 const app = express();
@@ -44,6 +45,9 @@ app.get('/dashboard', requireAuth, (req, res) => {
 });
 
 app.use('/chat', chatRoutes);
+
+// Catálogo de skills (CRUD): todas las rutas exigen sesión
+app.use('/skills', requireAuth, skillsRoutes);
 
 // UI kit de referencia para el equipo (solo en desarrollo)
 if (process.env.NODE_ENV !== 'production') {

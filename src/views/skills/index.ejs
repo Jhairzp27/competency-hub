@@ -1,0 +1,105 @@
+<%- include('../partials/head', { title: 'Catálogo de skills' }) %>
+<main id="main" class="main">
+<div class="container stack">
+  <header class="page-header">
+    <h1>Catálogo de skills</h1>
+    <p>Competencias técnicas y conductuales que la consultora espera de su equipo.</p>
+    <p>
+      <a class="btn btn-primary" href="/skills/nueva">
+        <%- include('../partials/icon', { name: 'plus', label: null }) %>
+        <span>Nueva skill</span>
+      </a>
+    </p>
+  </header>
+
+  <%- include('../partials/flash') %>
+
+  <%# Búsqueda y filtros: formulario GET, los filtros quedan en la URL y la paginación los conserva %>
+  <form class="toolbar" method="GET" action="/skills" role="search" aria-label="Buscar y filtrar skills">
+    <div class="form-group">
+      <label class="form-label" for="filtro-q">Buscar por nombre</label>
+      <div class="toolbar-search">
+        <%- include('../partials/icon', { name: 'search', size: 18, label: null }) %>
+        <input class="form-control" id="filtro-q" name="q" type="search" placeholder="Ej. Node.js" value="<%= query.q %>">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="filtro-categoria">Categoría</label>
+      <select class="form-control" id="filtro-categoria" name="categoria">
+        <option value="">Todas</option>
+        <% CATEGORIAS.forEach((c) => { %>
+          <option value="<%= c.value %>"<%= query.categoria === c.value ? ' selected' : '' %>><%= c.label %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="filtro-importancia">Importancia</label>
+      <select class="form-control" id="filtro-importancia" name="importancia">
+        <option value="">Todas</option>
+        <% IMPORTANCIAS.forEach((i) => { %>
+          <option value="<%= i.value %>"<%= query.importancia === i.value ? ' selected' : '' %>><%= i.label %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn btn-primary" type="submit">Buscar</button>
+      <% if (hayFiltros) { %><a class="btn btn-ghost" href="/skills">Limpiar</a><% } %>
+    </div>
+  </form>
+
+  <% if (items.length) { %>
+    <div class="table-wrapper">
+      <table class="table">
+        <caption class="sr-only">Skills del catálogo, página <%= page %> de <%= totalPages %></caption>
+        <thead>
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Categoría</th>
+            <th scope="col">Nivel esperado</th>
+            <th scope="col">Importancia</th>
+            <th scope="col" class="cell-actions"><span class="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% items.forEach((skill) => { %>
+            <tr>
+              <td class="cell-title"><a href="/skills/<%= skill.id %>"><%= skill.nombre %></a></td>
+              <td><span class="badge <%= skill.categoria === 'TECNICA' ? 'badge-technical' : 'badge-behavioral' %>"><%= etiquetaCategoria(skill.categoria) %></span></td>
+              <td><%- include('../partials/level', { level: skill.nivelEsperado }) %></td>
+              <td><span class="badge<%= ['ALTA', 'CRITICA'].includes(skill.importancia) ? ' badge-high' : '' %>"><%= etiquetaImportancia(skill.importancia) %></span></td>
+              <td class="cell-actions">
+                <div class="table-actions">
+                  <a class="btn btn-ghost btn-icon" href="/skills/<%= skill.id %>" aria-label="Ver <%= skill.nombre %>"><%- include('../partials/icon', { name: 'eye', label: null }) %></a>
+                  <a class="btn btn-ghost btn-icon" href="/skills/<%= skill.id %>/editar" aria-label="Editar <%= skill.nombre %>"><%- include('../partials/icon', { name: 'pencil', label: null }) %></a>
+                  <a class="btn btn-ghost btn-icon" href="/skills/<%= skill.id %>/eliminar" aria-label="Eliminar <%= skill.nombre %>"
+                    data-confirm
+                    data-confirm-action="/skills/<%= skill.id %>/eliminar"
+                    data-confirm-title="¿Eliminar la skill «<%= skill.nombre %>»?"
+                    data-confirm-message="Se eliminará del catálogo. Esta acción no se puede deshacer."
+                    data-confirm-label="Eliminar"><%- include('../partials/icon', { name: 'trash', label: null }) %></a>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <%- include('../partials/pagination', { page, totalPages, totalItems, pageSize, baseUrl: '/skills', query }) %>
+  <% } else { %>
+    <div class="card">
+      <div class="empty-state">
+        <%- include('../partials/icon', { name: 'search', size: 40, label: null }) %>
+        <h3>No se encontraron skills</h3>
+        <% if (hayFiltros) { %>
+          <p>Prueba con otro nombre o <a href="/skills">limpia los filtros</a>.</p>
+        <% } else { %>
+          <p>Todavía no hay skills en el catálogo.</p>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+</div>
+</main>
+<%- include('../partials/confirm-dialog') %>
+<%- include('../partials/footer', { scripts: ['/js/confirm-dialog.js'] }) %>
