@@ -1,4 +1,5 @@
 const skillService = require('./skills.service');
+const { localsFormulario, valoresAnteriores, errorPrismaACampos } = require('./skills.validation');
 const {
   CATEGORIAS,
   IMPORTANCIAS,
@@ -67,6 +68,41 @@ exports.detalle = async (req, res) => {
   const skill = id && (await skillService.obtenerPorId(id));
   if (!skill) return skillNoEncontrada(res);
   res.render('skills/detalle', { ...helpersVista, skill });
+};
+
+// Datos de la vista "Nueva skill" (también los usa el manejo de errores de validación).
+exports.localsNueva = () => ({
+  titulo: 'Nueva skill',
+  action: '/skills',
+  submitLabel: 'Crear skill',
+  cancelUrl: '/skills',
+});
+
+// GET /skills/nueva
+exports.formularioNueva = (req, res) => {
+  res.render('skills/nueva', localsFormulario(exports.localsNueva()));
+};
+
+// POST /skills  (llega aquí solo si pasó la validación; ver skills.routes.js)
+exports.crear = async (req, res) => {
+  try {
+    const skill = await skillService.crear(req.skillData, req.session.user.id);
+    req.session.flash = { type: 'success', message: `Se creó la skill «${skill.nombre}».` };
+    return res.redirect(`/skills/${skill.id}`);
+  } catch (err) {
+    // Carrera poco probable: otro usuario guardó el mismo nombre justo antes
+    const fieldErrors = errorPrismaACampos(err);
+    if (!fieldErrors) throw err;
+    return res.status(400).render(
+      'skills/nueva',
+      localsFormulario({
+        ...exports.localsNueva(),
+        errors: Object.values(fieldErrors).map((msg) => ({ msg })),
+        fieldErrors,
+        old: valoresAnteriores(req.body),
+      })
+    );
+  }
 };
 
 exports.leerFiltros = leerFiltros;
