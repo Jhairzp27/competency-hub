@@ -21,6 +21,12 @@ router.get('/', (req, res) => {
       { msg: 'El nivel esperado debe ser un número del 1 al 5.' },
     ],
     sampleSkills,
+    sampleUsers: ['Ana Torres', 'Luis Pérez', `${req.session.user ? req.session.user.name : 'Invitado'} (tú)`],
+    sampleMessages: [
+      { author: 'Ana Torres', content: '¿Alguien tiene experiencia con Prisma y PostgreSQL?', createdAt: new Date(Date.now() - 6 * 60000) },
+      { author: 'Luis Pérez', content: 'Sí, lo usamos en el último proyecto. Te paso la guía.', createdAt: new Date(Date.now() - 4 * 60000) },
+      { author: 'Tú', content: 'Acabo de agregar la skill «Prisma ORM» al catálogo 👍', createdAt: new Date(Date.now() - 60000), own: true },
+    ],
     query: {
       q: typeof req.query.q === 'string' ? req.query.q : '',
       category: typeof req.query.category === 'string' ? req.query.category : '',

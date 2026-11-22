@@ -1,0 +1,19 @@
+<%#
+  Partial: un mensaje del historial del chat (renderizado en el servidor).
+  Uso (desde una vista):
+    include('../partials/chat-message', { message: m, own: m.userId === currentUser.id })
+  - message: { author, content, createdAt }
+  - El mismo marcado lo genera ChatUI.appendMessage() en /js/chat-ui.js para los mensajes en tiempo real.
+%>
+<%
+  const msg = locals.message || {};
+  const sentAt = msg.createdAt ? new Date(msg.createdAt) : null;
+  const hhmm = sentAt ? sentAt.toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit' }) : '';
+%>
+<li class="chat-message<%= locals.own ? ' is-own' : '' %>">
+  <p class="chat-meta">
+    <span class="chat-author"><%= locals.own ? 'Tú' : (msg.author || 'Usuario') %></span>
+    <% if (sentAt) { %><time class="chat-time" datetime="<%= sentAt.toISOString() %>"><%= hhmm %></time><% } %>
+  </p>
+  <p class="chat-bubble"><%= msg.content %></p>
+</li>

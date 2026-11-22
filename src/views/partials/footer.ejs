@@ -11,7 +11,11 @@
     </div>
   </footer>
 
+  <%# Región de notificaciones en tiempo real (ver /js/toast.js) %>
+  <div class="toast-region" role="status" aria-live="polite" data-toast-region></div>
+
   <script src="/js/nav.js" defer></script>
+  <script src="/js/toast.js" defer></script>
   <% (locals.scripts || []).forEach((src) => { %>
   <script src="<%= src %>" defer></script>
   <% }) %>

@@ -142,7 +142,57 @@ res.redirect('/skills');
   data-confirm-action="/skills/&lt;%= skill.id %&gt;/delete"
   data-confirm-title="¿Eliminar la skill «&lt;%= skill.name %&gt;»?"&gt;Eliminar&lt;/button&gt;</code>
     </section>
+
+    <section class="kit-section" aria-labelledby="kit-toast">
+      <h2 id="kit-toast">Notificaciones (toast)</h2>
+      <p><code>/js/toast.js</code> se carga en todas las páginas. Se cierran solas a los 4 segundos.</p>
+      <div class="cluster">
+        <button class="btn btn-secondary" type="button" data-demo-toast="info">Nueva skill (info)</button>
+        <button class="btn btn-secondary" type="button" data-demo-toast="success">Éxito</button>
+        <button class="btn btn-secondary" type="button" data-demo-toast="warning">Aviso</button>
+        <button class="btn btn-secondary" type="button" data-demo-toast="error">Error</button>
+      </div>
+      <code class="kit-code">// Por ejemplo, al recibir el evento de Socket.IO:
+socket.on('skill:created', (skill) =&gt; {
+  Toast.show({ type: 'info', title: 'Nueva skill', message: `${skill.author} creó «${skill.name}».` });
+});</code>
+    </section>
+
+    <section class="kit-section" aria-labelledby="kit-chat">
+      <h2 id="kit-chat">Chat</h2>
+      <p>Historial con <code>partials/chat-message</code>; mensajes en tiempo real con <code>ChatUI.appendMessage()</code> de <code>/js/chat-ui.js</code>. Demo local (sin Socket.IO).</p>
+      <div class="chat">
+        <div class="card chat-panel">
+          <div class="chat-header">
+            <h3>Sala general</h3>
+            <span class="badge badge-success"><span data-online-count><%= sampleUsers.length %></span>&nbsp;en línea</span>
+          </div>
+          <ul class="chat-messages" role="log" aria-live="polite" aria-label="Mensajes de la sala general" data-chat-messages>
+            <li class="chat-system">Ana Torres se unió al chat</li>
+            <% sampleMessages.forEach((m) => { %>
+              <%- include('partials/chat-message', { message: m, own: m.own }) %>
+            <% }) %>
+          </ul>
+          <form class="chat-form" data-demo-chat-form novalidate>
+            <div class="form-group">
+              <label class="sr-only" for="kit-chat-input">Escribe un mensaje</label>
+              <textarea class="form-control" id="kit-chat-input" name="content" rows="1" maxlength="500" placeholder="Escribe un mensaje…" required></textarea>
+              <span class="chat-counter" data-chat-counter>0/500</span>
+            </div>
+            <button class="btn btn-primary btn-icon" type="submit" aria-label="Enviar mensaje"><%- include('partials/icon', { name: 'send', label: null }) %></button>
+          </form>
+        </div>
+        <aside class="card" aria-labelledby="kit-online-title">
+          <h3 id="kit-online-title" class="cluster"><%- include('partials/icon', { name: 'users', label: null }) %> Conectados</h3>
+          <ul class="online-users mt-md" data-online-users>
+            <% sampleUsers.forEach((u) => { %>
+              <li class="online-user"><span class="online-dot" aria-hidden="true"></span><span><%= u %></span></li>
+            <% }) %>
+          </ul>
+        </aside>
+      </div>
+    </section>
   </div>
 </main>
 <%- include('partials/confirm-dialog') %>
-<%- include('partials/footer', { scripts: ['/js/confirm-dialog.js'] }) %>
+<%- include('partials/footer', { scripts: ['/js/confirm-dialog.js', '/js/chat-ui.js', '/js/ui-kit.js'] }) %>
