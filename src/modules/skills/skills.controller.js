@@ -28,8 +28,29 @@ function leerPagina(valor) {
   return Math.max(1, Number.parseInt(valor, 10));
 }
 
+// Id de la URL (/skills/:id). Solo enteros positivos que caben en INTEGER de PostgreSQL;
+// cualquier otra cosa ("abc", "1.5", "0", "-3", "1e3") se responde como 404.
+const MAX_INT = 2147483647;
+function leerId(valor) {
+  if (typeof valor !== 'string' || !/^[1-9]\d{0,9}$/.test(valor)) return null;
+  const id = Number(valor);
+  return id <= MAX_INT ? id : null;
+}
+
+function skillNoEncontrada(res) {
+  return res.status(404).render('errors/error', {
+    status: 404,
+    heading: 'Skill no encontrada',
+    message: 'La skill que buscas no existe o fue eliminada. Vuelve al catálogo para ver las disponibles.',
+  });
+}
+
+// Fecha legible en español de Ecuador, p. ej. "22 nov 2026, 15:30".
+const formatearFecha = (fecha) =>
+  new Intl.DateTimeFormat('es-EC', { dateStyle: 'medium', timeStyle: 'short' }).format(fecha);
+
 // Ayudas de presentación disponibles en las vistas de skills.
-const helpersVista = { etiquetaCategoria, etiquetaImportancia, CATEGORIAS, IMPORTANCIAS };
+const helpersVista = { etiquetaCategoria, etiquetaImportancia, formatearFecha, CATEGORIAS, IMPORTANCIAS };
 
 // GET /skills?q=&categoria=&importancia=&page=
 exports.listar = async (req, res) => {
@@ -40,5 +61,14 @@ exports.listar = async (req, res) => {
   res.render('skills/index', { ...helpersVista, ...resultado, query: filtros, hayFiltros });
 };
 
+// GET /skills/:id
+exports.detalle = async (req, res) => {
+  const id = leerId(req.params.id);
+  const skill = id && (await skillService.obtenerPorId(id));
+  if (!skill) return skillNoEncontrada(res);
+  res.render('skills/detalle', { ...helpersVista, skill });
+};
+
 exports.leerFiltros = leerFiltros;
 exports.leerPagina = leerPagina;
+exports.leerId = leerId;

@@ -1,0 +1,42 @@
+<%- include('../partials/head', { title: skill.nombre }) %>
+<main id="main" class="main">
+<div class="container stack">
+  <p><a href="/skills">&larr; Volver al catálogo</a></p>
+
+  <%- include('../partials/flash') %>
+
+  <article class="card stack" aria-labelledby="skill-titulo">
+    <header class="page-header">
+      <h1 id="skill-titulo"><%= skill.nombre %></h1>
+      <p class="cluster">
+        <span class="badge <%= skill.categoria === 'TECNICA' ? 'badge-technical' : 'badge-behavioral' %>"><%= etiquetaCategoria(skill.categoria) %></span>
+        <span class="badge<%= ['ALTA', 'CRITICA'].includes(skill.importancia) ? ' badge-high' : '' %>">Importancia: <%= etiquetaImportancia(skill.importancia) %></span>
+      </p>
+    </header>
+
+    <dl class="stack">
+      <div>
+        <dt>Nivel esperado</dt>
+        <dd><%- include('../partials/level', { level: skill.nivelEsperado }) %></dd>
+      </div>
+      <div>
+        <dt>Descripción</dt>
+        <dd><%= skill.descripcion %></dd>
+      </div>
+      <div>
+        <dt>Registrada por</dt>
+        <dd><%= skill.createdBy ? skill.createdBy.name : 'Catálogo base' %></dd>
+      </div>
+      <div>
+        <dt>Creada</dt>
+        <dd><time datetime="<%= skill.createdAt.toISOString() %>"><%= formatearFecha(skill.createdAt) %></time></dd>
+      </div>
+      <div>
+        <dt>Última actualización</dt>
+        <dd><time datetime="<%= skill.updatedAt.toISOString() %>"><%= formatearFecha(skill.updatedAt) %></time></dd>
+      </div>
+    </dl>
+  </article>
+</div>
+</main>
+<%- include('../partials/footer') %>

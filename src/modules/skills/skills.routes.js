@@ -6,5 +6,6 @@ const skillsController = require('./skills.controller');
 const router = express.Router();
 
 router.get('/', skillsController.listar);
+router.get('/:id', skillsController.detalle);
 
 module.exports = router;
