@@ -1,0 +1,59 @@
+<%- include('../partials/head', { title: skill.nombre }) %>
+<main id="main" class="main">
+<div class="container stack">
+  <p><a href="/skills">&larr; Volver al catálogo</a></p>
+
+  <%- include('../partials/flash') %>
+
+  <article class="card stack" aria-labelledby="skill-titulo">
+    <header class="page-header">
+      <h1 id="skill-titulo"><%= skill.nombre %></h1>
+      <p class="cluster">
+        <span class="badge <%= skill.categoria === 'TECNICA' ? 'badge-technical' : 'badge-behavioral' %>"><%= etiquetaCategoria(skill.categoria) %></span>
+        <span class="badge<%= ['ALTA', 'CRITICA'].includes(skill.importancia) ? ' badge-high' : '' %>">Importancia: <%= etiquetaImportancia(skill.importancia) %></span>
+      </p>
+    </header>
+
+    <dl class="stack">
+      <div>
+        <dt>Nivel esperado</dt>
+        <dd><%- include('../partials/level', { level: skill.nivelEsperado }) %></dd>
+      </div>
+      <div>
+        <dt>Descripción</dt>
+        <dd><%= skill.descripcion %></dd>
+      </div>
+      <div>
+        <dt>Registrada por</dt>
+        <dd><%= skill.createdBy ? skill.createdBy.name : 'Catálogo base' %></dd>
+      </div>
+      <div>
+        <dt>Creada</dt>
+        <dd><time datetime="<%= skill.createdAt.toISOString() %>"><%= formatearFecha(skill.createdAt) %></time></dd>
+      </div>
+      <div>
+        <dt>Última actualización</dt>
+        <dd><time datetime="<%= skill.updatedAt.toISOString() %>"><%= formatearFecha(skill.updatedAt) %></time></dd>
+      </div>
+    </dl>
+
+    <div class="cluster">
+      <a class="btn btn-primary" href="/skills/<%= skill.id %>/editar">
+        <%- include('../partials/icon', { name: 'pencil', label: null }) %>
+        <span>Editar</span>
+      </a>
+      <a class="btn btn-danger" href="/skills/<%= skill.id %>/eliminar"
+        data-confirm
+        data-confirm-action="/skills/<%= skill.id %>/eliminar"
+        data-confirm-title="¿Eliminar la skill «<%= skill.nombre %>»?"
+        data-confirm-message="Se eliminará del catálogo. Esta acción no se puede deshacer."
+        data-confirm-label="Eliminar">
+        <%- include('../partials/icon', { name: 'trash', label: null }) %>
+        <span>Eliminar</span>
+      </a>
+    </div>
+  </article>
+</div>
+</main>
+<%- include('../partials/confirm-dialog') %>
+<%- include('../partials/footer', { scripts: ['/js/confirm-dialog.js'] }) %>
