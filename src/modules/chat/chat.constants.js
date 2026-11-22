@@ -4,6 +4,8 @@
  * (y coinciden con las restricciones CHECK de la tabla chat_messages).
  */
 module.exports = {
+  // Namespace de Socket.IO del chat (separado del de notificaciones)
+  CHAT_NAMESPACE: '/chat',
   // Sala única del primer bimestre (la columna room deja preparado el modelo para más salas)
   GENERAL_ROOM: 'general',
   // Largo máximo de un mensaje, en caracteres, después de quitar espacios extremos

@@ -50,5 +50,5 @@
     </div>
   </div>
 </main>
-<%# Cliente de Socket.IO: lo sirve el propio servidor en /socket.io/ (no se usa ningún servicio externo) %>
-<%- include('partials/footer', { scripts: ['/socket.io/socket.io.min.js', '/js/form-validation.js', '/js/chat-ui.js', '/js/chat.js'] }) %>
+<%# El cliente de Socket.IO lo carga footer.ejs en todas las páginas con sesión (lo sirve la propia app en /socket.io/) %>
+<%- include('partials/footer', { scripts: ['/js/form-validation.js', '/js/chat-ui.js', '/js/chat.js'] }) %>

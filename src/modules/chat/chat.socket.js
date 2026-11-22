@@ -1,5 +1,9 @@
 /**
- * Chat en tiempo real con Socket.IO (sala general).
+ * Chat en tiempo real con Socket.IO (namespace /chat, sala general).
+ *
+ * El chat tiene su propio namespace para que la lista de conectados solo cuente a quienes
+ * están en la pantalla del chat (las notificaciones de skills usan /notifications en todas
+ * las páginas). Ambos namespaces comparten una sola conexión WebSocket (multiplexación).
  *
  * Contrato de eventos:
  *   Cliente -> servidor
@@ -10,11 +14,11 @@
  *     chat:system  { text, createdAt }                           (alguien se unió o salió)
  *     chat:error   { code, error }                               (p. ej. sesión expirada; luego se desconecta)
  *
- * La sesión de Express se comparte con Socket.IO en server.js (io.engine.use(sessionMiddleware)),
- * así que el handshake llega con la cookie de sesión y aquí se decide si se acepta.
+ * El handshake se autentica con la sesión de Express (ver middlewares/socket-auth.middleware.js).
  */
 const prisma = require('../../config/db');
-const { GENERAL_ROOM } = require('./chat.constants');
+const { authenticateHandshake } = require('../../middlewares/socket-auth.middleware');
+const { CHAT_NAMESPACE, GENERAL_ROOM } = require('./chat.constants');
 const { validateMessage } = require('./chat.validators');
 const { toMessageDTO } = require('./chat.controller');
 
@@ -24,35 +28,6 @@ const RATE_LIMIT = { max: 5, windowMs: 5000 };
 // Usuarios conectados: userId -> { id, name, connections, sentAt }
 // Se cuentan las conexiones para que alguien con dos pestañas abiertas aparezca una sola vez.
 const onlineUsers = new Map();
-
-/**
- * Defensa contra Cross-Site WebSocket Hijacking: el navegador siempre envía Origin en el
- * handshake, y debe coincidir con el host de la app. Los clientes que no son navegadores
- * (pruebas, scripts) no envían Origin ni tienen cookies de otro sitio, así que se aceptan.
- */
-function isSameOrigin(headers) {
-  const { origin, host } = headers;
-  if (!origin) return true;
-  try {
-    return new URL(origin).host === host;
-  } catch {
-    return false;
-  }
-}
-
-/** Middleware del handshake: rechaza la conexión si no hay sesión iniciada. */
-function authenticateHandshake(socket, next) {
-  if (!isSameOrigin(socket.handshake.headers)) {
-    return next(new Error('Origen no permitido'));
-  }
-  const user = socket.request.session && socket.request.session.user;
-  if (!user) {
-    return next(new Error('No autorizado'));
-  }
-  // Solo se guardan los datos necesarios; el autor de cada mensaje sale de aquí, nunca del cliente
-  socket.data.user = { id: user.id, name: user.name };
-  next();
-}
 
 /**
  * Vuelve a leer la sesión desde la BD: si el usuario cerró sesión o la sesión expiró
@@ -89,9 +64,10 @@ function systemMessage(text) {
 }
 
 function registerChat(io) {
-  io.use(authenticateHandshake);
+  const chat = io.of(CHAT_NAMESPACE);
+  chat.use(authenticateHandshake);
 
-  io.on('connection', (socket) => {
+  chat.on('connection', (socket) => {
     const { id, name } = socket.data.user;
     socket.join(GENERAL_ROOM);
 
@@ -106,7 +82,7 @@ function registerChat(io) {
     if (entry.connections === 1) {
       socket.to(GENERAL_ROOM).emit('chat:system', systemMessage(`${name} se unió al chat`));
     }
-    io.to(GENERAL_ROOM).emit('chat:users', onlineList());
+    chat.to(GENERAL_ROOM).emit('chat:users', onlineList());
     console.log(`[chat] Conectado: usuario ${id} (${entry.connections} conexión/es)`);
 
     socket.on('chat:send', async (payload, ack) => {
@@ -136,7 +112,7 @@ function registerChat(io) {
         });
         const message = toMessageDTO(saved);
         // Se envía a toda la sala (incluido el autor): el cliente pinta el mensaje al recibir este evento
-        io.to(GENERAL_ROOM).emit('chat:message', message);
+        chat.to(GENERAL_ROOM).emit('chat:message', message);
         reply({ ok: true, message });
       } catch (err) {
         console.error('[chat] Error al guardar el mensaje:', err);
@@ -150,9 +126,9 @@ function registerChat(io) {
       current.connections -= 1;
       if (current.connections <= 0) {
         onlineUsers.delete(id);
-        io.to(GENERAL_ROOM).emit('chat:system', systemMessage(`${name} salió del chat`));
+        chat.to(GENERAL_ROOM).emit('chat:system', systemMessage(`${name} salió del chat`));
       }
-      io.to(GENERAL_ROOM).emit('chat:users', onlineList());
+      chat.to(GENERAL_ROOM).emit('chat:users', onlineList());
       console.log(`[chat] Desconectado: usuario ${id}`);
     });
   });
@@ -161,8 +137,6 @@ function registerChat(io) {
 module.exports = {
   registerChat,
   // Exportados para las pruebas automatizadas
-  authenticateHandshake,
-  isSameOrigin,
   isRateLimited,
   RATE_LIMIT,
 };

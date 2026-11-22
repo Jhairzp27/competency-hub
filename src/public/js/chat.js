@@ -76,8 +76,9 @@
     window.location.assign('/auth/login');
   }
 
-  // --- Conexión (el cliente se reconecta solo si se cae la red o se reinicia el servidor) ---
-  const socket = window.io();
+  // --- Conexión al namespace /chat (el cliente se reconecta solo si se cae la red o se reinicia el servidor).
+  // Comparte la misma conexión WebSocket que /notifications (realtime.js): Socket.IO multiplexa los namespaces.
+  const socket = window.io('/chat');
 
   socket.on('connect', function () {
     connected = true;

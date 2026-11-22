@@ -172,10 +172,21 @@ res.redirect('/skills');
         <button class="btn btn-secondary" type="button" data-demo-toast="warning">Aviso</button>
         <button class="btn btn-secondary" type="button" data-demo-toast="error">Error</button>
       </div>
-      <code class="kit-code">// Por ejemplo, al recibir el evento de Socket.IO:
-socket.on('skill:created', (skill) =&gt; {
-  Toast.show({ type: 'info', title: 'Nueva skill', message: `${skill.author} creó «${skill.name}».` });
+      <code class="kit-code">// /js/realtime.js (en todas las páginas con sesión) al recibir el evento de Socket.IO:
+socket.on('skill:created', (data) =&gt; {
+  Toast.show({ type: 'info', title: 'Nueva skill', message: `${data.by} creó la skill «${data.nombre}».` });
 });</code>
+
+      <h3 class="mt-lg">Aviso en tiempo real entre usuarios</h3>
+      <p>Envía <code>skill:created</code> o <code>skill:updated</code> por el namespace <code>/notifications</code> a los <strong>demás</strong> usuarios conectados. Ábrelo en otra ventana con otra cuenta para ver el toast. Requiere sesión.</p>
+      <form class="cluster" action="/ui-kit/notify-demo" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-secondary" type="submit" name="action" value="created">Simular «skill creada»</button>
+        <button class="btn btn-secondary" type="submit" name="action" value="updated">Simular «skill actualizada»</button>
+      </form>
+      <code class="kit-code">// En el CRUD de skills, DESPUÉS de guardar en la BD:
+const { notifySkillChange } = require('../notifications/notifications.socket');
+notifySkillChange(req, 'created', skill); // o 'updated'</code>
     </section>
 
     <section class="kit-section" aria-labelledby="kit-chat">

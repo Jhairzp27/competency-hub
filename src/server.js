@@ -3,7 +3,9 @@ const http = require('http');
 const { Server } = require('socket.io');
 const app = require('./app');
 const { sessionMiddleware } = require('./config/session');
+const { authenticateHandshake } = require('./middlewares/socket-auth.middleware');
 const { registerChat } = require('./modules/chat/chat.socket');
+const { registerNotifications } = require('./modules/notifications/notifications.socket');
 
 const PORT = process.env.PORT || 3000;
 
@@ -17,10 +19,17 @@ const io = new Server(server, {
 io.engine.use(sessionMiddleware);
 
 // Guardamos io en app para que el CRUD de Isaac pueda emitir notificaciones en tiempo real
+// (ver notifySkillChange en modules/notifications/notifications.socket.js)
 app.set('io', io);
 
-// Chat en tiempo real: autenticación en el handshake, sala general, mensajes y usuarios conectados
+// El namespace principal "/" no se usa, pero también exige sesión
+io.use(authenticateHandshake);
+
+// Namespace /chat: autenticación en el handshake, sala general, mensajes y usuarios conectados
 registerChat(io);
+
+// Namespace /notifications: avisos en todas las páginas cuando se crea o actualiza una skill
+registerNotifications(io);
 
 server.listen(PORT, () => {
   console.log(`Servidor corriendo en ${process.env.APP_URL || `http://localhost:${PORT}`}`);
