@@ -15,6 +15,7 @@ model User {
   role         String               @default("USER") @db.VarChar(20)
   createdAt    DateTime             @default(now()) @map("created_at")
   resetTokens  PasswordResetToken[]
+  skills       Skill[]
 
   @@map("users")
 }
@@ -31,4 +32,43 @@ model PasswordResetToken {
 
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+// ----- Módulo de Skills (Isaac) -----
+
+enum CategoriaSkill {
+  TECNICA
+  CONDUCTUAL
+
+  @@map("categoria_skill")
+}
+
+enum ImportanciaSkill {
+  BAJA
+  MEDIA
+  ALTA
+  CRITICA
+
+  @@map("importancia_skill")
+}
+
+model Skill {
+  id            Int              @id @default(autoincrement())
+  nombre        String           @unique @db.VarChar(80)
+  categoria     CategoriaSkill
+  nivelEsperado Int              @map("nivel_esperado") @db.SmallInt
+  importancia   ImportanciaSkill
+  descripcion   String           @db.VarChar(500)
+  createdById   Int?             @map("created_by_id")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([createdById])
+  // Búsqueda parcial por nombre (ILIKE '%texto%'): índice GIN de trigramas (extensión pg_trgm)
+  @@index([nombre(ops: raw("gin_trgm_ops"))], type: Gin, map: "skills_nombre_trgm_idx")
+  // Filtros del listado: categoría sola o categoría + importancia
+  @@index([categoria, importancia], map: "skills_categoria_importancia_idx")
+  @@map("skills")
 }
