@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Nueva contraseña</title></head>
+<body>
+  <h1>Establecer nueva contraseña</h1>
+  <% if (errors.length) { %>
+    <ul><% errors.forEach(e => { %><li style="color:red;"><%= e.msg %></li><% }) %></ul>
+  <% } %>
+  <form action="/auth/reset/<%= token %>" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div><label>Nueva contraseña: <input type="password" name="password" required></label></div>
+    <button type="submit">Actualizar</button>
+  </form>
+</body>
+</html>

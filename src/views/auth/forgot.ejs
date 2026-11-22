@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Recuperar clave</title></head>
+<body>
+  <h1>Recuperar contraseña</h1>
+  <% if (message) { %><p style="color:green;"><%= message %></p><% } %>
+  <% if (errors.length) { %>
+    <ul><% errors.forEach(e => { %><li style="color:red;"><%= e.msg %></li><% }) %></ul>
+  <% } %>
+  <form action="/auth/forgot" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div><label>Tu correo: <input type="email" name="email" required></label></div>
+    <button type="submit">Generar enlace</button>
+  </form>
+  <p><a href="/auth/login">Volver al login</a></p>
+</body>
+</html>

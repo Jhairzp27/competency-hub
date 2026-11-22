@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Login - Competency Hub</title></head>
+<body>
+  <h1>Iniciar sesión</h1>
+  <% if (message) { %><p style="color:green;"><%= message %></p><% } %>
+  <% if (errors.length) { %>
+    <ul><% errors.forEach(e => { %><li style="color:red;"><%= e.msg %></li><% }) %></ul>
+  <% } %>
+  <form action="/auth/login" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <div><label>Email: <input type="email" name="email" value="<%= old.email || '' %>" required></label></div>
+    <div><label>Contraseña: <input type="password" name="password" required></label></div>
+    <button type="submit">Entrar</button>
+  </form>
+  <p><a href="/auth/register">Crear cuenta</a> | <a href="/auth/forgot">Olvidé mi contraseña</a></p>
+</body>
+</html>

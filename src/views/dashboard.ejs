@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Dashboard - Competency Hub</title></head>
+<body>
+  <h1>Bienvenido, <%= currentUser.name %></h1>
+  <nav>
+    <a href="/skills">Catálogo de Skills (CRUD)</a> |
+    <a href="/chat">Chat en Tiempo Real</a>
+  </nav>
+  <form action="/auth/logout" method="POST" style="margin-top:20px;">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button type="submit">Cerrar sesión</button>
+  </form>
+</body>
+</html>
