@@ -518,7 +518,26 @@ select.form-control {
 }
 
 /* --------------------------------------------------------------------------
-   9. Utilidades
+   9. Pie de página
+   -------------------------------------------------------------------------- */
+.site-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-card);
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+}
+
+.site-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-md);
+  padding-block: var(--space-md);
+}
+
+/* --------------------------------------------------------------------------
+   10. Utilidades
    -------------------------------------------------------------------------- */
 .text-muted { color: var(--color-muted-foreground); }
 .text-sm { font-size: var(--text-sm); }
@@ -527,7 +546,7 @@ select.form-control {
 .mt-lg { margin-top: var(--space-lg); }
 
 /* --------------------------------------------------------------------------
-   10. Responsive (mobile-first)
+   11. Responsive (mobile-first)
    -------------------------------------------------------------------------- */
 @media (min-width: 640px) {
   .grid-2 { grid-template-columns: repeat(2, 1fr); }
@@ -544,7 +563,7 @@ select.form-control {
 }
 
 /* --------------------------------------------------------------------------
-   11. Movimiento reducido
+   12. Movimiento reducido
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *,

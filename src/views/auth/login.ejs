@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Login - Competency Hub</title></head>
-<body>
+<%- include('../partials/head', { title: 'Iniciar sesión' }) %>
+<main id="main" class="main">
+<div class="container">
   <h1>Iniciar sesión</h1>
   <% if (message) { %><p style="color:green;"><%= message %></p><% } %>
   <% if (errors.length) { %>
@@ -14,5 +13,6 @@
     <button type="submit">Entrar</button>
   </form>
   <p><a href="/auth/register">Crear cuenta</a> | <a href="/auth/forgot">Olvidé mi contraseña</a></p>
-</body>
-</html>
+</div>
+</main>
+<%- include('../partials/footer') %>

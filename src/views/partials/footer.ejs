@@ -1,0 +1,18 @@
+<%#
+  Partial: pie de página común y cierre del documento.
+  Uso (desde una vista): include('../partials/footer', { scripts: ['/js/form-validation.js'] })
+  Variables opcionales:
+    - scripts: lista de rutas JS propias de la vista (se cargan con defer)
+%>
+  <footer class="site-footer">
+    <div class="container site-footer-inner">
+      <p>&copy; <%= new Date().getFullYear() %> Competency Hub</p>
+      <p>Proyecto de Aplicaciones Web Avanzadas · EPN</p>
+    </div>
+  </footer>
+
+  <% (locals.scripts || []).forEach((src) => { %>
+  <script src="<%= src %>" defer></script>
+  <% }) %>
+</body>
+</html>

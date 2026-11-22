@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Recuperar clave</title></head>
-<body>
+<%- include('../partials/head', { title: 'Recuperar contraseña' }) %>
+<main id="main" class="main">
+<div class="container">
   <h1>Recuperar contraseña</h1>
   <% if (message) { %><p style="color:green;"><%= message %></p><% } %>
   <% if (errors.length) { %>
@@ -13,5 +12,6 @@
     <button type="submit">Generar enlace</button>
   </form>
   <p><a href="/auth/login">Volver al login</a></p>
-</body>
-</html>
+</div>
+</main>
+<%- include('../partials/footer') %>

@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Nueva contraseña</title></head>
-<body>
+<%- include('../partials/head', { title: 'Nueva contraseña' }) %>
+<main id="main" class="main">
+<div class="container">
   <h1>Establecer nueva contraseña</h1>
   <% if (errors.length) { %>
     <ul><% errors.forEach(e => { %><li style="color:red;"><%= e.msg %></li><% }) %></ul>
@@ -11,5 +10,6 @@
     <div><label>Nueva contraseña: <input type="password" name="password" required></label></div>
     <button type="submit">Actualizar</button>
   </form>
-</body>
-</html>
+</div>
+</main>
+<%- include('../partials/footer') %>
