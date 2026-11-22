@@ -12,7 +12,7 @@
 
       <%- include('../partials/alert', { type: 'error', title: 'No pudimos crear tu cuenta', messages: errors }) %>
 
-      <form class="form" action="/auth/register" method="POST" data-validate>
+      <form class="form" action="/auth/register" method="POST" data-validate data-error-summary>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
         <div class="form-group">
@@ -35,13 +35,13 @@
         <div class="form-group">
           <label class="form-label" for="password">Contraseña</label>
           <input class="form-control" id="password" name="password" type="password"
-            autocomplete="new-password" aria-describedby="password-hint"
+            autocomplete="new-password" aria-describedby="password-requirements"
             required minlength="8" maxlength="64" data-rule-uppercase data-rule-digit
             data-msg-required="La contraseña es obligatoria."
             data-msg-length="La contraseña debe tener entre 8 y 64 caracteres."
             data-msg-uppercase="La contraseña debe incluir al menos una letra mayúscula."
             data-msg-digit="La contraseña debe incluir al menos un número.">
-          <span class="form-hint" id="password-hint">Entre 8 y 64 caracteres, con al menos una mayúscula y un número.</span>
+          <%- include('../partials/password-checklist', { inputId: 'password' }) %>
         </div>
 
         <button class="btn btn-primary btn-block" type="submit">Crear cuenta</button>
@@ -51,4 +51,4 @@
     </section>
   </div>
 </main>
-<%- include('../partials/footer', { scripts: ['/js/form-validation.js'] }) %>
+<%- include('../partials/footer', { scripts: ['/js/form-validation.js', '/js/password-checklist.js'] }) %>

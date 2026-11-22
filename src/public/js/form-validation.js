@@ -20,8 +20,9 @@
  *
  * Comportamiento (MASTER.md §9): valida al salir del campo (blur) y, si ya
  * tenía error, mientras se escribe; al enviar valida todo, evita el envío si
- * hay errores y enfoca el primer campo inválido. El servidor SIEMPRE vuelve a
- * validar: esto solo mejora la experiencia.
+ * hay errores y enfoca el primer campo inválido. Con data-error-summary en el
+ * <form>, muestra además un resumen enfocable con enlaces a cada campo.
+ * El servidor SIEMPRE vuelve a validar: esto solo mejora la experiencia.
  */
 (function () {
   'use strict';
@@ -162,6 +163,67 @@
     });
   }
 
+  /**
+   * Resumen de errores (MASTER.md §9): con data-error-summary en el <form>,
+   * al fallar el envío se muestra arriba una lista enfocable con enlaces a
+   * cada campo inválido. Se actualiza mientras el usuario corrige.
+   */
+  function labelOf(field) {
+    const label = field.labels && field.labels[0];
+    return label ? label.textContent.replace('*', '').trim() : field.name;
+  }
+
+  function renderSummary(form, invalid, moveFocus) {
+    let box = form.querySelector('[data-error-summary-box]');
+    if (!invalid.length) {
+      if (box) box.remove();
+      return;
+    }
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'alert alert-error error-summary';
+      box.setAttribute('role', 'alert');
+      box.setAttribute('tabindex', '-1');
+      box.setAttribute('data-error-summary-box', '');
+      form.insertBefore(box, form.firstElementChild);
+    }
+    box.replaceChildren();
+
+    const body = document.createElement('div');
+    body.className = 'alert-body';
+    const title = document.createElement('p');
+    title.className = 'alert-title';
+    title.id = (form.id || 'form') + '-error-summary-title';
+    title.textContent = invalid.length === 1
+      ? 'Revisa 1 campo antes de continuar'
+      : 'Revisa ' + invalid.length + ' campos antes de continuar';
+    box.setAttribute('aria-labelledby', title.id);
+
+    const list = document.createElement('ul');
+    list.className = 'alert-list';
+    invalid.forEach(function (field) {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = '#' + field.id;
+      link.textContent = labelOf(field) + ': ' + getError(field);
+      link.addEventListener('click', function (event) {
+        event.preventDefault();
+        field.focus();
+      });
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+
+    body.append(title, list);
+    box.appendChild(body);
+    if (moveFocus) box.focus();
+  }
+
+  function refreshSummary(form) {
+    if (form.dataset.errorSummary === undefined || !form.querySelector('[data-error-summary-box]')) return;
+    renderSummary(form, fieldsOf(form).filter(function (f) { return f.getAttribute('aria-invalid') === 'true'; }), false);
+  }
+
   function setLoading(form) {
     const submit = form.querySelector('[type="submit"]');
     if (submit) {
@@ -179,7 +241,10 @@
         field.dataset.touched = 'true';
       });
       const live = function () {
-        if (field.getAttribute('aria-invalid') === 'true') validateField(field);
+        if (field.getAttribute('aria-invalid') === 'true') {
+          validateField(field);
+          refreshSummary(form);
+        }
       };
       field.addEventListener('input', live);
       field.addEventListener('change', live);
@@ -194,9 +259,14 @@
       if (invalid.length) {
         event.preventDefault();
         form.dispatchEvent(new CustomEvent('invalid-submit', { detail: { fields: invalid } }));
-        if (!form.dataset.errorSummary) invalid[0].focus();
+        if (form.dataset.errorSummary !== undefined) {
+          renderSummary(form, invalid, true); // el foco va al resumen
+        } else {
+          invalid[0].focus();
+        }
         return;
       }
+      renderSummary(form, [], false);
       form.dataset.submitting = 'true';
       setLoading(form);
     });

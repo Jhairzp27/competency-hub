@@ -12,19 +12,19 @@
 
       <%- include('../partials/alert', { type: 'error', title: 'No pudimos actualizar la contraseña', messages: errors }) %>
 
-      <form class="form" action="/auth/reset/<%= token %>" method="POST" data-validate>
+      <form class="form" action="/auth/reset/<%= token %>" method="POST" data-validate data-error-summary>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
         <div class="form-group">
           <label class="form-label" for="password">Nueva contraseña</label>
           <input class="form-control" id="password" name="password" type="password"
-            autocomplete="new-password" aria-describedby="password-hint"
+            autocomplete="new-password" aria-describedby="password-requirements"
             required minlength="8" maxlength="64" data-rule-uppercase data-rule-digit
             data-msg-required="La nueva contraseña es obligatoria."
             data-msg-length="La nueva contraseña debe tener entre 8 y 64 caracteres."
             data-msg-uppercase="Debe incluir al menos una letra mayúscula."
             data-msg-digit="Debe incluir al menos un número.">
-          <span class="form-hint" id="password-hint">Entre 8 y 64 caracteres, con al menos una mayúscula y un número.</span>
+          <%- include('../partials/password-checklist', { inputId: 'password' }) %>
         </div>
 
         <button class="btn btn-primary btn-block" type="submit">Guardar nueva contraseña</button>
@@ -36,4 +36,4 @@
     </section>
   </div>
 </main>
-<%- include('../partials/footer', { scripts: ['/js/form-validation.js'] }) %>
+<%- include('../partials/footer', { scripts: ['/js/form-validation.js', '/js/password-checklist.js'] }) %>

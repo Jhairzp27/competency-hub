@@ -590,6 +590,68 @@ select.form-control {
   display: none;
 }
 
+/* Resumen de errores al enviar (lo crea /js/form-validation.js) */
+.error-summary:focus {
+  outline: 2px solid var(--color-destructive);
+  outline-offset: 2px;
+}
+
+.error-summary a {
+  color: var(--color-destructive-hover);
+  font-weight: 500;
+}
+
+/* Requisitos de contraseña en vivo (partials/password-checklist.ejs) */
+.password-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0;
+  font-size: var(--text-sm);
+  color: var(--color-muted-foreground);
+}
+
+.password-checklist li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: color var(--duration-fast) ease;
+}
+
+.check-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.password-checklist li.is-met {
+  color: var(--color-success);
+}
+
+.password-checklist li.is-met .check-icon {
+  border-color: var(--color-success);
+  background-color: var(--color-success);
+}
+
+/* Marca de verificación dibujada con CSS (sin depender del color: cambia la forma) */
+.password-checklist li.is-met .check-icon::after {
+  content: '';
+  width: 4px;
+  height: 7px;
+  margin-top: -2px;
+  border: solid var(--color-on-accent);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;

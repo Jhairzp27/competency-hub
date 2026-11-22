@@ -13,7 +13,7 @@
       <%- include('../partials/alert', { type: 'success', messages: message }) %>
       <%- include('../partials/alert', { type: 'error', title: 'No pudimos iniciar sesión', messages: errors }) %>
 
-      <form class="form" action="/auth/login" method="POST" data-validate>
+      <form class="form" action="/auth/login" method="POST" data-validate data-error-summary>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
         <div class="form-group">
