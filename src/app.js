@@ -25,6 +25,7 @@ app.use(verifyCsrfToken);
 
 app.use((req, res, next) => {
   res.locals.currentUser = req.session.user || null;
+  res.locals.currentPath = req.path; // para marcar el enlace activo del navbar
   next();
 });
 

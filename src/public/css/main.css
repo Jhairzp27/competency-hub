@@ -5,7 +5,7 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. Tokens de diseño
+   Tokens de diseño
    -------------------------------------------------------------------------- */
 :root {
   /* Colores */
@@ -79,7 +79,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. Reset ligero
+   Reset ligero
    -------------------------------------------------------------------------- */
 *,
 *::before,
@@ -112,7 +112,7 @@ select {
 }
 
 /* --------------------------------------------------------------------------
-   3. Base
+   Base
    -------------------------------------------------------------------------- */
 body {
   min-height: 100vh;
@@ -170,7 +170,7 @@ code,
 }
 
 /* --------------------------------------------------------------------------
-   4. Accesibilidad
+   Accesibilidad
    -------------------------------------------------------------------------- */
 
 /* Enlace «Saltar al contenido»: invisible hasta recibir el foco */
@@ -208,7 +208,7 @@ code,
 }
 
 /* --------------------------------------------------------------------------
-   5. Layout
+   Layout
    -------------------------------------------------------------------------- */
 .container {
   width: 100%;
@@ -266,7 +266,7 @@ code,
 }
 
 /* --------------------------------------------------------------------------
-   6. Botones
+   Botones
    -------------------------------------------------------------------------- */
 .btn {
   display: inline-flex;
@@ -375,7 +375,7 @@ code,
 }
 
 /* --------------------------------------------------------------------------
-   7. Formularios
+   Formularios
    -------------------------------------------------------------------------- */
 .form {
   display: flex;
@@ -473,7 +473,7 @@ select.form-control {
 }
 
 /* --------------------------------------------------------------------------
-   8. Tarjetas
+   Tarjetas
    -------------------------------------------------------------------------- */
 .card {
   background-color: var(--color-card);
@@ -518,7 +518,7 @@ select.form-control {
 }
 
 /* --------------------------------------------------------------------------
-   9. Pie de página
+   Pie de página
    -------------------------------------------------------------------------- */
 .site-footer {
   margin-top: auto;
@@ -537,7 +537,216 @@ select.form-control {
 }
 
 /* --------------------------------------------------------------------------
-   10. Utilidades
+   Iconos (Lucide, SVG en línea)
+   -------------------------------------------------------------------------- */
+.icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* --------------------------------------------------------------------------
+   Navbar
+   -------------------------------------------------------------------------- */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.navbar-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  gap: var(--space-md);
+}
+
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--touch-target);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--color-on-primary);
+  text-decoration: none;
+}
+
+.navbar-brand:hover {
+  color: var(--color-on-primary);
+}
+
+.navbar-logo {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-accent);
+}
+
+.navbar-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-on-primary);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) ease;
+}
+
+.navbar-toggle:hover {
+  background-color: var(--color-secondary);
+}
+
+.navbar-toggle-close,
+.navbar-toggle[aria-expanded='true'] .navbar-toggle-open {
+  display: none;
+}
+
+.navbar-toggle[aria-expanded='true'] .navbar-toggle-close {
+  display: inline;
+}
+
+/* Móvil: panel desplegable bajo la barra */
+.navbar-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  background-color: var(--color-primary);
+  border-top: 1px solid var(--color-secondary);
+  box-shadow: var(--shadow-lg);
+}
+
+.navbar-menu.is-open {
+  display: block;
+}
+
+.navbar-links {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.navbar-link,
+.navbar-logout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--touch-target);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  color: var(--color-on-primary);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.navbar-link:hover,
+.navbar-logout:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-on-primary);
+}
+
+.navbar-link.is-active {
+  background-color: var(--color-secondary);
+  box-shadow: inset 3px 0 0 var(--color-accent-soft);
+}
+
+.navbar-user {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-secondary);
+}
+
+.navbar-user-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.navbar-logout {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-size: var(--text-base);
+  cursor: pointer;
+}
+
+/* Escritorio: menú horizontal siempre visible */
+@media (min-width: 768px) {
+  .navbar-toggle {
+    display: none;
+  }
+
+  .navbar-menu,
+  .navbar-menu.is-open {
+    position: static;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .navbar-links {
+    flex-direction: row;
+    margin-left: var(--space-lg);
+  }
+
+  .navbar-link {
+    padding: var(--space-sm) 0.875rem;
+  }
+
+  .navbar-link.is-active {
+    box-shadow: inset 0 -3px 0 var(--color-accent-soft);
+  }
+
+  .navbar-user {
+    flex-direction: row;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .navbar-user-name {
+    padding-block: 0;
+  }
+
+  .navbar-logout {
+    width: auto;
+    border: 1px solid var(--color-secondary);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Utilidades
    -------------------------------------------------------------------------- */
 .text-muted { color: var(--color-muted-foreground); }
 .text-sm { font-size: var(--text-sm); }
@@ -546,7 +755,7 @@ select.form-control {
 .mt-lg { margin-top: var(--space-lg); }
 
 /* --------------------------------------------------------------------------
-   11. Responsive (mobile-first)
+   Responsive (mobile-first)
    -------------------------------------------------------------------------- */
 @media (min-width: 640px) {
   .grid-2 { grid-template-columns: repeat(2, 1fr); }
@@ -563,7 +772,7 @@ select.form-control {
 }
 
 /* --------------------------------------------------------------------------
-   12. Movimiento reducido
+   Movimiento reducido
    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *,
