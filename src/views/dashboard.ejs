@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Dashboard - Competency Hub</title></head>
-<body>
+<%- include('partials/head', { title: 'Inicio' }) %>
+<main id="main" class="main">
+<div class="container">
   <h1>Bienvenido, <%= currentUser.name %></h1>
   <nav>
     <a href="/skills">Catálogo de Skills (CRUD)</a> |
@@ -11,5 +10,6 @@
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <button type="submit">Cerrar sesión</button>
   </form>
-</body>
-</html>
+</div>
+</main>
+<%- include('partials/footer') %>

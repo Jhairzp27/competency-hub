@@ -1,0 +1,63 @@
+<%#
+  Partial: barra de navegación principal. Se incluye automáticamente desde head.ejs.
+  - Con sesión: Inicio, Skills, Chat, nombre del usuario y «Cerrar sesión».
+  - Sin sesión: Iniciar sesión y Crear cuenta.
+  El enlace activo se calcula con res.locals.currentPath (definido en app.js).
+%>
+<%
+  const path = locals.currentPath || '';
+  const isActive = (prefix) => path === prefix || path.startsWith(prefix + '/');
+  const userLinks = [
+    { href: '/dashboard', label: 'Inicio', icon: 'home' },
+    { href: '/skills', label: 'Skills', icon: 'list-checks' },
+    { href: '/chat', label: 'Chat', icon: 'message' },
+  ];
+  const guestLinks = [
+    { href: '/auth/login', label: 'Iniciar sesión', icon: 'log-in' },
+    { href: '/auth/register', label: 'Crear cuenta', icon: 'user-plus' },
+  ];
+  const links = locals.currentUser ? userLinks : guestLinks;
+%>
+<header class="navbar">
+  <nav class="container navbar-inner" aria-label="Navegación principal">
+    <a class="navbar-brand" href="<%= locals.currentUser ? '/dashboard' : '/auth/login' %>">
+      <span class="navbar-logo"><%- include('icon', { name: 'terminal', size: 18, label: null }) %></span>
+      <span>Competency Hub</span>
+    </a>
+
+    <button class="navbar-toggle" type="button" aria-expanded="false" aria-controls="navbar-menu" data-nav-toggle>
+      <span class="navbar-toggle-open"><%- include('icon', { name: 'menu', size: 24, label: null }) %></span>
+      <span class="navbar-toggle-close"><%- include('icon', { name: 'x', size: 24, label: null }) %></span>
+      <span class="sr-only">Abrir o cerrar el menú</span>
+    </button>
+
+    <div class="navbar-menu" id="navbar-menu" data-nav-menu>
+      <ul class="navbar-links">
+        <% links.forEach((link) => { %>
+          <li>
+            <a class="navbar-link<%= isActive(link.href) ? ' is-active' : '' %>" href="<%= link.href %>"<% if (isActive(link.href)) { %> aria-current="page"<% } %>>
+              <%- include('icon', { name: link.icon, size: 18, label: null }) %>
+              <span><%= link.label %></span>
+            </a>
+          </li>
+        <% }) %>
+      </ul>
+
+      <% if (locals.currentUser) { %>
+        <div class="navbar-user">
+          <span class="navbar-user-name">
+            <%- include('icon', { name: 'user', size: 18, label: null }) %>
+            <span><%= currentUser.name %></span>
+          </span>
+          <form action="/auth/logout" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="navbar-logout" type="submit">
+              <%- include('icon', { name: 'log-out', size: 18, label: null }) %>
+              <span>Cerrar sesión</span>
+            </button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+  </nav>
+</header>

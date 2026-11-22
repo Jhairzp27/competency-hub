@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Registro - Competency Hub</title></head>
-<body>
+<%- include('../partials/head', { title: 'Crear cuenta' }) %>
+<main id="main" class="main">
+<div class="container">
   <h1>Crear cuenta</h1>
   <% if (errors.length) { %>
     <ul><% errors.forEach(e => { %><li style="color:red;"><%= e.msg %></li><% }) %></ul>
@@ -14,5 +13,6 @@
     <button type="submit">Registrarse</button>
   </form>
   <p><a href="/auth/login">¿Ya tienes cuenta? Inicia sesión</a></p>
-</body>
-</html>
+</div>
+</main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,207 @@
+<%- include('partials/head', { title: 'UI kit', description: 'Referencia de componentes de interfaz de Competency Hub.' }) %>
+<main id="main" class="main">
+  <div class="container">
+    <%- include('partials/flash') %>
+
+    <div class="page-header">
+      <div>
+        <h1>UI kit</h1>
+        <p>Componentes reutilizables de Competency Hub. Página disponible solo en desarrollo.</p>
+      </div>
+    </div>
+
+    <section class="kit-section card" aria-labelledby="kit-alerts">
+      <h2 id="kit-alerts">Alertas</h2>
+      <p>Partial <code>partials/alert</code>. Acepta un texto, una lista o los errores de express-validator.</p>
+      <%- include('partials/alert', { type: 'success', messages: 'Skill creada correctamente.' }) %>
+      <%- include('partials/alert', { type: 'error', title: 'Revisa los datos del formulario', messages: sampleErrors }) %>
+      <%- include('partials/alert', { type: 'warning', messages: 'Tu sesión expirará en 5 minutos.' }) %>
+      <%- include('partials/alert', { type: 'info', messages: 'Si el correo existe, se generó un enlace de recuperación.' }) %>
+      <code class="kit-code">&lt;%- include('../partials/alert', { type: 'error', title: 'Revisa los datos', messages: errors }) %&gt;</code>
+    </section>
+
+    <section class="kit-section card" aria-labelledby="kit-flash">
+      <h2 id="kit-flash">Mensajes flash</h2>
+      <p>Se guardan en la sesión antes de redirigir y se muestran una sola vez con <code>partials/flash</code>.</p>
+      <a class="btn btn-secondary" href="/ui-kit/flash">Probar mensaje flash</a>
+      <code class="kit-code">// En el controlador:
+req.session.flash = { type: 'success', message: 'Skill creada correctamente.' };
+res.redirect('/skills');
+
+// En la vista, al inicio de &lt;main&gt;:
+&lt;%- include('../partials/flash') %&gt;</code>
+    </section>
+
+    <section class="kit-section card" aria-labelledby="kit-buttons">
+      <h2 id="kit-buttons">Botones</h2>
+      <p>Clases <code>.btn</code> + variante. Alto mínimo de 44px.</p>
+      <div class="cluster">
+        <button class="btn btn-primary" type="button"><%- include('partials/icon', { name: 'plus', label: null }) %> Nueva skill</button>
+        <button class="btn btn-secondary" type="button">Cancelar</button>
+        <button class="btn btn-danger" type="button"><%- include('partials/icon', { name: 'trash', label: null }) %> Eliminar</button>
+        <button class="btn btn-ghost" type="button">Ver más</button>
+        <button class="btn btn-primary" type="button" disabled>Deshabilitado</button>
+        <button class="btn btn-primary is-loading" type="button">Guardando</button>
+      </div>
+    </section>
+
+    <section class="kit-section card" aria-labelledby="kit-forms">
+      <h2 id="kit-forms">Formularios</h2>
+      <p>Label siempre visible, ayuda debajo y error junto al campo con <code>aria-invalid</code>.</p>
+      <form class="form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="kit-name">Nombre de la skill<span class="required" aria-hidden="true">*</span></label>
+          <input class="form-control" id="kit-name" type="text" placeholder="Ej. Node.js" aria-describedby="kit-name-hint">
+          <span class="form-hint" id="kit-name-hint">Entre 3 y 100 caracteres.</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="kit-level">Nivel esperado<span class="required" aria-hidden="true">*</span></label>
+          <input class="form-control" id="kit-level" type="number" value="7" aria-invalid="true" aria-describedby="kit-level-error">
+          <span class="form-error" id="kit-level-error">El nivel esperado debe ser un número del 1 al 5.</span>
+        </div>
+      </form>
+    </section>
+    <section class="kit-section" aria-labelledby="kit-list">
+      <h2 id="kit-list">Listado: búsqueda, tabla, nivel y paginación</h2>
+      <p>Base para el CRUD de skills. La búsqueda es un formulario <code>GET</code> (los filtros quedan en la URL).</p>
+
+      <form class="toolbar" method="GET" action="/ui-kit" role="search">
+        <div class="form-group">
+          <label class="form-label" for="kit-q">Buscar por nombre</label>
+          <div class="toolbar-search">
+            <%- include('partials/icon', { name: 'search', size: 18, label: null }) %>
+            <input class="form-control" id="kit-q" name="q" type="search" placeholder="Ej. Node.js" value="<%= query.q || '' %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="kit-category">Categoría</label>
+          <select class="form-control" id="kit-category" name="category">
+            <option value="">Todas</option>
+            <option value="TECNICA"<%= query.category === 'TECNICA' ? ' selected' : '' %>>Técnica</option>
+            <option value="CONDUCTUAL"<%= query.category === 'CONDUCTUAL' ? ' selected' : '' %>>Conductual</option>
+          </select>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-primary" type="submit">Buscar</button>
+          <a class="btn btn-ghost" href="/ui-kit">Limpiar</a>
+        </div>
+      </form>
+
+      <div class="table-wrapper">
+        <table class="table">
+          <caption class="sr-only">Skills de ejemplo</caption>
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Categoría</th>
+              <th scope="col">Nivel esperado</th>
+              <th scope="col">Importancia</th>
+              <th scope="col" class="cell-actions"><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sampleSkills.forEach((s) => { %>
+              <tr>
+                <td class="cell-title"><%= s.name %></td>
+                <td><span class="badge <%= s.category === 'TECNICA' ? 'badge-technical' : 'badge-behavioral' %>"><%= s.category === 'TECNICA' ? 'Técnica' : 'Conductual' %></span></td>
+                <td><%- include('partials/level', { level: s.level }) %></td>
+                <td><span class="badge<%= s.importance === 'Alta' ? ' badge-high' : '' %>"><%= s.importance %></span></td>
+                <td class="cell-actions">
+                  <div class="table-actions">
+                    <a class="btn btn-ghost btn-icon" href="/ui-kit" aria-label="Ver <%= s.name %>"><%- include('partials/icon', { name: 'eye', label: null }) %></a>
+                    <a class="btn btn-ghost btn-icon" href="/ui-kit" aria-label="Editar <%= s.name %>"><%- include('partials/icon', { name: 'pencil', label: null }) %></a>
+                    <button class="btn btn-ghost btn-icon" type="button" aria-label="Eliminar <%= s.name %>"
+                      data-confirm
+                      data-confirm-action="/ui-kit/confirm-demo"
+                      data-confirm-title="¿Eliminar la skill «<%= s.name %>»?"
+                      data-confirm-message="Se eliminará del catálogo. Esta acción no se puede deshacer."
+                      data-confirm-label="Eliminar"><%- include('partials/icon', { name: 'trash', label: null }) %></button>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <%- include('partials/pagination', { page: parseInt(query.page, 10) || 3, totalPages: 8, totalItems: 75, pageSize: 10, baseUrl: '/ui-kit', query }) %>
+
+      <div class="card mt-lg">
+        <div class="empty-state">
+          <%- include('partials/icon', { name: 'search', size: 40, label: null }) %>
+          <h3>No se encontraron skills</h3>
+          <p>Prueba con otro nombre o limpia los filtros.</p>
+        </div>
+      </div>
+
+      <code class="kit-code">&lt;%- include('../partials/level', { level: skill.expectedLevel }) %&gt;
+&lt;%- include('../partials/pagination', { page, totalPages, totalItems, pageSize, baseUrl: '/skills', query: { q, category } }) %&gt;
+
+&lt;!-- Botón eliminar: abre el modal (incluir partials/confirm-dialog y /js/confirm-dialog.js) --&gt;
+&lt;button type="button" class="btn btn-danger" data-confirm
+  data-confirm-action="/skills/&lt;%= skill.id %&gt;/delete"
+  data-confirm-title="¿Eliminar la skill «&lt;%= skill.name %&gt;»?"&gt;Eliminar&lt;/button&gt;</code>
+    </section>
+
+    <section class="kit-section card" aria-labelledby="kit-errors">
+      <h2 id="kit-errors">Páginas de error</h2>
+      <p>Vista <code>errors/error</code>. El detalle técnico solo se registra en la consola del servidor.</p>
+      <div class="cluster">
+        <a class="btn btn-secondary" href="/ruta-que-no-existe">Ver página 404</a>
+        <a class="btn btn-secondary" href="/ui-kit/error-demo">Ver página 500</a>
+      </div>
+    </section>
+
+    <section class="kit-section" aria-labelledby="kit-toast">
+      <h2 id="kit-toast">Notificaciones (toast)</h2>
+      <p><code>/js/toast.js</code> se carga en todas las páginas. Se cierran solas a los 4 segundos.</p>
+      <div class="cluster">
+        <button class="btn btn-secondary" type="button" data-demo-toast="info">Nueva skill (info)</button>
+        <button class="btn btn-secondary" type="button" data-demo-toast="success">Éxito</button>
+        <button class="btn btn-secondary" type="button" data-demo-toast="warning">Aviso</button>
+        <button class="btn btn-secondary" type="button" data-demo-toast="error">Error</button>
+      </div>
+      <code class="kit-code">// Por ejemplo, al recibir el evento de Socket.IO:
+socket.on('skill:created', (skill) =&gt; {
+  Toast.show({ type: 'info', title: 'Nueva skill', message: `${skill.author} creó «${skill.name}».` });
+});</code>
+    </section>
+
+    <section class="kit-section" aria-labelledby="kit-chat">
+      <h2 id="kit-chat">Chat</h2>
+      <p>Historial con <code>partials/chat-message</code>; mensajes en tiempo real con <code>ChatUI.appendMessage()</code> de <code>/js/chat-ui.js</code>. Demo local (sin Socket.IO).</p>
+      <div class="chat">
+        <div class="card chat-panel">
+          <div class="chat-header">
+            <h3>Sala general</h3>
+            <span class="badge badge-success"><span data-online-count><%= sampleUsers.length %></span>&nbsp;en línea</span>
+          </div>
+          <ul class="chat-messages" role="log" aria-live="polite" aria-label="Mensajes de la sala general" data-chat-messages>
+            <li class="chat-system">Ana Torres se unió al chat</li>
+            <% sampleMessages.forEach((m) => { %>
+              <%- include('partials/chat-message', { message: m, own: m.own }) %>
+            <% }) %>
+          </ul>
+          <form class="chat-form" data-demo-chat-form novalidate>
+            <div class="form-group">
+              <label class="sr-only" for="kit-chat-input">Escribe un mensaje</label>
+              <textarea class="form-control" id="kit-chat-input" name="content" rows="1" maxlength="500" placeholder="Escribe un mensaje…" required></textarea>
+              <span class="chat-counter" data-chat-counter>0/500</span>
+            </div>
+            <button class="btn btn-primary btn-icon" type="submit" aria-label="Enviar mensaje"><%- include('partials/icon', { name: 'send', label: null }) %></button>
+          </form>
+        </div>
+        <aside class="card" aria-labelledby="kit-online-title">
+          <h3 id="kit-online-title" class="cluster"><%- include('partials/icon', { name: 'users', label: null }) %> Conectados</h3>
+          <ul class="online-users mt-md" data-online-users>
+            <% sampleUsers.forEach((u) => { %>
+              <li class="online-user"><span class="online-dot" aria-hidden="true"></span><span><%= u %></span></li>
+            <% }) %>
+          </ul>
+        </aside>
+      </div>
+    </section>
+  </div>
+</main>
+<%- include('partials/confirm-dialog') %>
+<%- include('partials/footer', { scripts: ['/js/confirm-dialog.js', '/js/chat-ui.js', '/js/ui-kit.js'] }) %>

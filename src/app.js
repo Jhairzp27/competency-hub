@@ -25,6 +25,10 @@ app.use(verifyCsrfToken);
 
 app.use((req, res, next) => {
   res.locals.currentUser = req.session.user || null;
+  res.locals.currentPath = req.path; // para marcar el enlace activo del navbar
+  // Mensaje flash: se muestra una sola vez (ver views/partials/flash.ejs)
+  res.locals.flash = req.session.flash || null;
+  if (req.session.flash) delete req.session.flash;
   next();
 });
 
@@ -38,9 +42,47 @@ app.get('/dashboard', requireAuth, (req, res) => {
   res.render('dashboard');
 });
 
+// UI kit de referencia para el equipo (solo en desarrollo)
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/ui-kit', require('./modules/ui/ui.routes'));
+}
+
+// 404: ninguna ruta coincidió
+app.use((req, res) => {
+  res.status(404).render('errors/error', {
+    status: 404,
+    heading: 'Página no encontrada',
+    message: 'La dirección que buscas no existe o fue movida. Revisa el enlace o vuelve al inicio.',
+  });
+});
+
+// Manejador de errores: registra el detalle en consola y muestra una página genérica
+// (nunca expone el stack ni mensajes internos al usuario)
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).send('Error interno del servidor.');
+  if (res.headersSent) return next(err);
+
+  const status = err.status && err.status >= 400 && err.status < 600 ? err.status : 500;
+  const isServerError = status >= 500;
+
+  res.status(status).render(
+    'errors/error',
+    {
+      status,
+      heading: isServerError ? 'Algo salió mal' : 'No se pudo completar la solicitud',
+      message: isServerError
+        ? 'Ocurrió un error inesperado en el servidor. Intenta de nuevo en unos minutos.'
+        : 'La solicitud no es válida. Revisa los datos e inténtalo de nuevo.',
+    },
+    (renderErr, html) => {
+      // Si la vista de error también falla, responde en texto plano
+      if (renderErr) {
+        console.error(renderErr);
+        return res.type('text').send('Error interno del servidor.');
+      }
+      res.send(html);
+    }
+  );
 });
 
 module.exports = app;
