@@ -5,63 +5,61 @@
  * views/partials/footer.ejs y /js/realtime.js) y muestran un toast cuando otra
  * persona crea o actualiza una skill del catálogo.
  *
+ * Puente entre el CRUD y los navegadores:
+ *   CRUD de skills --notificar()--> skillEvents (EventEmitter de Node, skills.events.js)
+ *                  --este módulo--> Socket.IO /notifications --> realtime.js --> Toast
+ * Así el CRUD no depende de Socket.IO y cada parte se puede probar por separado.
+ *
  * Contrato de eventos (servidor -> clientes):
  *   skill:created  { id, nombre, by, at }
  *   skill:updated  { id, nombre, by, at }
- *
- * Uso desde el CRUD de skills, DESPUÉS de guardar en la BD:
- *   const { notifySkillChange } = require('../notifications/notifications.socket');
- *   notifySkillChange(req, 'created', skill);   // o 'updated'
  */
 const { authenticateHandshake } = require('../../middlewares/socket-auth.middleware');
+const { skillEvents } = require('../skills/skills.events');
 
 const NOTIFICATIONS_NAMESPACE = '/notifications';
-const SKILL_EVENTS = { created: 'skill:created', updated: 'skill:updated' };
+const SKILL_EVENTS = ['skill:created', 'skill:updated'];
 
 // Cada usuario tiene su propia sala para poder excluirlo de sus propios avisos
 const userRoom = (userId) => `user:${userId}`;
 
+/** Datos que viajan al navegador: solo información pública del catálogo. */
+function toNotification(skill) {
+  return {
+    id: skill.id,
+    nombre: skill.nombre,
+    by: skill.por || 'Alguien',
+    at: new Date().toISOString(),
+  };
+}
+
+/**
+ * Registra el namespace y se suscribe a los eventos del CRUD de skills.
+ * Devuelve una función que quita las suscripciones.
+ */
 function registerNotifications(io) {
   const notifications = io.of(NOTIFICATIONS_NAMESPACE);
   notifications.use(authenticateHandshake);
   notifications.on('connection', (socket) => {
     socket.join(userRoom(socket.data.user.id));
   });
-}
 
-/**
- * Avisa a los demás usuarios conectados que una skill se creó o se actualizó.
- * Quien hizo el cambio no recibe el toast (ya ve el mensaje flash de confirmación).
- * Devuelve true si se emitió el aviso.
- */
-function notifySkillChange(req, action, skill) {
-  const event = SKILL_EVENTS[action];
-  if (!event) {
-    throw new Error(`Acción de notificación desconocida: ${action}. Usa 'created' o 'updated'.`);
-  }
+  const listeners = SKILL_EVENTS.map((event) => {
+    const listener = (skill, meta = {}) => {
+      // Quien hizo el cambio no recibe el toast: ya ve el mensaje flash de confirmación
+      const target = meta.actorId ? notifications.except(userRoom(meta.actorId)) : notifications;
+      target.emit(event, toNotification(skill));
+    };
+    skillEvents.on(event, listener);
+    return [event, listener];
+  });
 
-  const io = req.app.get('io');
-  // Sin servidor de sockets (p. ej. pruebas con supertest) o sin skill, no hay nada que avisar
-  if (!io || !skill) return false;
-
-  const actor = req.session && req.session.user;
-  // Solo datos públicos del catálogo: nunca correos ni otros datos personales
-  const payload = {
-    id: skill.id,
-    nombre: skill.nombre,
-    by: actor ? actor.name : 'Alguien',
-    at: new Date().toISOString(),
-  };
-
-  const notifications = io.of(NOTIFICATIONS_NAMESPACE);
-  const target = actor ? notifications.except(userRoom(actor.id)) : notifications;
-  target.emit(event, payload);
-  return true;
+  return () => listeners.forEach(([event, listener]) => skillEvents.off(event, listener));
 }
 
 module.exports = {
   registerNotifications,
-  notifySkillChange,
+  toNotification,
   NOTIFICATIONS_NAMESPACE,
   SKILL_EVENTS,
 };

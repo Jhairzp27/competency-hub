@@ -21,12 +21,13 @@ jest.mock('../src/config/session', () => {
 jest.mock('../src/config/db', () => ({
   user: { findUnique: jest.fn() },
   chatMessage: { findMany: jest.fn(), create: jest.fn() },
+  skill: { findFirst: jest.fn(), create: jest.fn() },
 }));
 
 const prisma = require('../src/config/db');
 const app = require('../src/app');
 const { createSocketServer } = require('../src/socket');
-const { notifySkillChange } = require('../src/modules/notifications/notifications.socket');
+const { notificar } = require('../src/modules/skills/skills.events');
 const { RATE_LIMIT } = require('../src/modules/chat/chat.socket');
 
 const PASSWORD = 'Prueba1234';
@@ -244,33 +245,52 @@ describe('Chat en tiempo real (sala general)', () => {
 });
 
 describe('Notificación en tiempo real de skills', () => {
-  const reqDe = (user) => ({ app, session: { user } });
+  test('crear una skill por HTTP (CRUD) avisa a los demás conectados, pero no a quien la creó', async () => {
+    const skill = {
+      id: 5, nombre: 'Docker', categoria: 'TECNICA', nivelEsperado: 2, importancia: 'ALTA',
+      descripcion: 'Contenedores para entornos de desarrollo.', createdById: 1,
+    };
+    prisma.skill.findFirst.mockResolvedValue(null); // el nombre no está repetido
+    prisma.skill.create.mockResolvedValue(skill);
 
-  test('al crear o actualizar una skill avisa a los demás conectados, pero no a quien hizo el cambio', async () => {
     const ana = await connect('/notifications', cookies.ana);
     const beto = await connect('/notifications', cookies.beto);
+    const avisosAna = collect(ana, 'skill:created', 500);
+    const avisoBeto = waitFor(beto, 'skill:created');
 
-    const avisosAna = collect(ana, 'skill:created');
-    const creada = waitFor(beto, 'skill:created');
-    expect(notifySkillChange(reqDe(USERS[1]), 'created', { id: 5, nombre: 'Docker' })).toBe(true);
-    await expect(creada).resolves.toMatchObject({ id: 5, nombre: 'Docker', by: 'Ana Torres' });
+    // Ana crea la skill con el formulario del CRUD (con su token CSRF)
+    const form = await fetch(`${baseUrl}/skills/nueva`, { headers: { cookie: cookies.ana } });
+    const _csrf = (await form.text()).match(/name="_csrf" value="([^"]+)"/)[1];
+    const res = await fetch(`${baseUrl}/skills`, {
+      method: 'POST',
+      redirect: 'manual',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: cookies.ana },
+      body: new URLSearchParams({
+        _csrf, nombre: skill.nombre, categoria: skill.categoria, nivelEsperado: '2',
+        importancia: skill.importancia, descripcion: skill.descripcion,
+      }).toString(),
+    });
+
+    expect(res.status).toBe(302);
+    await expect(avisoBeto).resolves.toMatchObject({ id: 5, nombre: 'Docker', by: 'Ana Torres' });
     expect(await avisosAna).toEqual([]);
-
-    const actualizada = waitFor(ana, 'skill:updated');
-    notifySkillChange(reqDe(USERS[2]), 'updated', { id: 5, nombre: 'Docker y Compose' });
-    await expect(actualizada).resolves.toMatchObject({ nombre: 'Docker y Compose', by: 'Beto Ruiz' });
   });
 
-  test('el aviso solo lleva datos públicos (sin correos ni otros datos personales)', async () => {
+  test('actualizar una skill avisa con skill:updated y el nombre de quien la cambió', async () => {
+    const ana = await connect('/notifications', cookies.ana);
+    const aviso = waitFor(ana, 'skill:updated');
+    notificar('skill:updated', { id: 5, nombre: 'Docker y Compose' }, USERS[2]);
+    await expect(aviso).resolves.toMatchObject({ id: 5, nombre: 'Docker y Compose', by: 'Beto Ruiz' });
+  });
+
+  test('el aviso solo lleva datos públicos (sin descripción, correos ni ids de usuario)', async () => {
     const beto = await connect('/notifications', cookies.beto);
     const aviso = waitFor(beto, 'skill:created');
-    notifySkillChange(reqDe({ ...USERS[1] }), 'created', { id: 9, nombre: 'Git', descripcion: 'x', createdById: 1 });
+    notificar('skill:created', { id: 9, nombre: 'Git', descripcion: 'x', createdById: 1, categoria: 'TECNICA' }, USERS[1]);
     expect(Object.keys(await aviso).sort()).toEqual(['at', 'by', 'id', 'nombre']);
   });
 
-  test('valida la acción y no falla si no hay servidor de sockets', () => {
-    expect(() => notifySkillChange(reqDe(USERS[1]), 'deleted', { id: 1, nombre: 'X' })).toThrow('Acción de notificación desconocida');
-    const reqSinSockets = { app: { get: () => undefined }, session: {} };
-    expect(notifySkillChange(reqSinSockets, 'created', { id: 1, nombre: 'X' })).toBe(false);
+  test('las páginas sin sesión no reciben avisos (el namespace exige sesión)', async () => {
+    await expect(connect('/notifications', null)).rejects.toThrow('No autorizado');
   });
 });

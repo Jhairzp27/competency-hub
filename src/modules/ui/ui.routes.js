@@ -4,7 +4,7 @@
  */
 const express = require('express');
 const { requireAuth } = require('../../middlewares/auth.middleware');
-const { notifySkillChange } = require('../notifications/notifications.socket');
+const { notificar } = require('../skills/skills.events');
 
 const router = express.Router();
 
@@ -50,10 +50,11 @@ router.post('/confirm-demo', (req, res) => {
 });
 
 // Demostración de la notificación en tiempo real (Socket.IO): avisa a los DEMÁS usuarios
-// conectados como si se hubiera creado o actualizado una skill. No guarda nada en la BD.
+// conectados como si se hubiera creado o actualizado una skill. Usa el mismo camino que el
+// CRUD (notificar -> skillEvents -> /notifications), pero no guarda nada en la BD.
 router.post('/notify-demo', requireAuth, (req, res) => {
-  const action = req.body.action === 'updated' ? 'updated' : 'created';
-  notifySkillChange(req, action, { id: 0, nombre: 'Skill de demostración' });
+  const evento = req.body.action === 'updated' ? 'skill:updated' : 'skill:created';
+  notificar(evento, { id: 0, nombre: 'Skill de demostración' }, req.session.user);
   req.session.flash = {
     type: 'success',
     message: 'Aviso enviado a los demás usuarios conectados (demo). Míralo desde otra ventana con otra cuenta.',

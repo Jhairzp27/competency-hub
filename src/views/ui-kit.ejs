@@ -184,9 +184,9 @@ socket.on('skill:created', (data) =&gt; {
         <button class="btn btn-secondary" type="submit" name="action" value="created">Simular «skill creada»</button>
         <button class="btn btn-secondary" type="submit" name="action" value="updated">Simular «skill actualizada»</button>
       </form>
-      <code class="kit-code">// En el CRUD de skills, DESPUÉS de guardar en la BD:
-const { notifySkillChange } = require('../notifications/notifications.socket');
-notifySkillChange(req, 'created', skill); // o 'updated'</code>
+      <code class="kit-code">// El CRUD de skills, DESPUÉS de guardar en la BD (skills.controller.js):
+notificar('skill:created', skill, req.session.user); // o 'skill:updated'
+// skills.events.js lo emite en skillEvents y notifications.socket.js lo reenvía por Socket.IO</code>
     </section>
 
     <section class="kit-section" aria-labelledby="kit-chat">
