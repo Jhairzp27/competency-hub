@@ -1,0 +1,32 @@
+<%#
+  Partial: caja de alerta (éxito, error, aviso o información).
+  Uso (desde una vista):
+    include('../partials/alert', { type: 'error', title: 'Revisa los datos', messages: errors })
+  Variables:
+    - type:     'success' | 'error' | 'warning' | 'info' (por defecto 'info')
+    - title:    título opcional en negrita
+    - messages: texto, lista de textos o lista de errores de express-validator ({ msg })
+  Accesibilidad: error/aviso usan role="alert"; éxito/info usan role="status".
+%>
+<%
+  const alertType = ['success', 'error', 'warning', 'info'].includes(locals.type) ? locals.type : 'info';
+  const alertIcons = { success: 'check-circle', error: 'alert-circle', warning: 'alert-triangle', info: 'info' };
+  const raw = locals.messages == null ? [] : (Array.isArray(locals.messages) ? locals.messages : [locals.messages]);
+  const alertMessages = raw.map((m) => (typeof m === 'string' ? m : m && m.msg)).filter(Boolean);
+  const alertRole = alertType === 'error' || alertType === 'warning' ? 'alert' : 'status';
+%>
+<% if (locals.title || alertMessages.length) { %>
+<div class="alert alert-<%= alertType %>" role="<%= alertRole %>">
+  <%- include('icon', { name: alertIcons[alertType], size: 20, label: null, className: 'alert-icon' }) %>
+  <div class="alert-body">
+    <% if (locals.title) { %><p class="alert-title"><%= locals.title %></p><% } %>
+    <% if (alertMessages.length === 1) { %>
+      <p><%= alertMessages[0] %></p>
+    <% } else if (alertMessages.length > 1) { %>
+      <ul class="alert-list">
+        <% alertMessages.forEach((m) => { %><li><%= m %></li><% }) %>
+      </ul>
+    <% } %>
+  </div>
+</div>
+<% } %>

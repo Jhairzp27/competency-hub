@@ -746,6 +746,103 @@ select.form-control {
 }
 
 /* --------------------------------------------------------------------------
+   Alertas
+   -------------------------------------------------------------------------- */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid;
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+
+.alert + .alert,
+.alert + * {
+  margin-top: var(--space-md);
+}
+
+.alert-icon {
+  margin-top: 1px;
+}
+
+.alert-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-title {
+  font-weight: 600;
+  font-size: var(--text-base);
+}
+
+.alert-list {
+  margin-top: var(--space-xs);
+  padding-left: 1.25rem;
+}
+
+.alert-success {
+  background-color: var(--color-success-soft);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.alert-error {
+  background-color: var(--color-destructive-soft);
+  border-color: var(--color-destructive);
+  color: var(--color-destructive);
+}
+
+.alert-warning {
+  background-color: var(--color-warning-soft);
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+.alert-info {
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
+.alert .alert-title,
+.alert p,
+.alert li {
+  color: var(--color-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   UI kit (página de referencia solo en desarrollo)
+   -------------------------------------------------------------------------- */
+.kit-section + .kit-section {
+  margin-top: var(--space-xl);
+}
+
+.kit-section > h2 {
+  margin-bottom: var(--space-xs);
+}
+
+.kit-section > p {
+  margin-bottom: var(--space-md);
+  color: var(--color-muted-foreground);
+}
+
+.kit-code {
+  display: block;
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--text-sm);
+  white-space: pre;
+}
+
+/* --------------------------------------------------------------------------
    Utilidades
    -------------------------------------------------------------------------- */
 .text-muted { color: var(--color-muted-foreground); }

@@ -26,6 +26,9 @@ app.use(verifyCsrfToken);
 app.use((req, res, next) => {
   res.locals.currentUser = req.session.user || null;
   res.locals.currentPath = req.path; // para marcar el enlace activo del navbar
+  // Mensaje flash: se muestra una sola vez (ver views/partials/flash.ejs)
+  res.locals.flash = req.session.flash || null;
+  if (req.session.flash) delete req.session.flash;
   next();
 });
 
@@ -38,6 +41,11 @@ app.use('/auth', authRoutes);
 app.get('/dashboard', requireAuth, (req, res) => {
   res.render('dashboard');
 });
+
+// UI kit de referencia para el equipo (solo en desarrollo)
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/ui-kit', require('./modules/ui/ui.routes'));
+}
 
 app.use((err, req, res, next) => {
   console.error(err);

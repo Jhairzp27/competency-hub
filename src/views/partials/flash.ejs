@@ -1,0 +1,11 @@
+<%#
+  Partial: muestra el mensaje flash de la sesión (una sola vez) y lo descarta.
+  Uso (desde una vista, al inicio de <main>): include('../partials/flash')
+
+  Para crear un mensaje flash en un controlador, antes de redirigir:
+    req.session.flash = { type: 'success', message: 'Skill creada correctamente.' };
+    res.redirect('/skills');
+%>
+<% if (locals.flash) { %>
+  <%- include('alert', { type: flash.type, title: flash.title || null, messages: flash.message }) %>
+<% } %>
