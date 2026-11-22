@@ -1,5 +1,6 @@
 const skillService = require('./skills.service');
 const { localsFormulario, valoresAnteriores, errorPrismaACampos } = require('./skills.validation');
+const { notificar } = require('./skills.events');
 const {
   CATEGORIAS,
   IMPORTANCIAS,
@@ -98,6 +99,7 @@ exports.actualizar = async (req, res) => {
   try {
     const skill = await skillService.actualizar(req.skill.id, req.skillData);
     if (!skill) return skillNoEncontrada(res); // se eliminó mientras se editaba
+    notificar('skill:updated', skill, req.session.user);
     req.session.flash = { type: 'success', message: `Se actualizó la skill «${skill.nombre}».` };
     return res.redirect(`/skills/${skill.id}`);
   } catch (err) {
@@ -146,6 +148,7 @@ exports.formularioNueva = (req, res) => {
 exports.crear = async (req, res) => {
   try {
     const skill = await skillService.crear(req.skillData, req.session.user.id);
+    notificar('skill:created', skill, req.session.user);
     req.session.flash = { type: 'success', message: `Se creó la skill «${skill.nombre}».` };
     return res.redirect(`/skills/${skill.id}`);
   } catch (err) {
