@@ -16,6 +16,11 @@
 
   <script src="/js/nav.js" defer></script>
   <script src="/js/toast.js" defer></script>
+  <% if (locals.currentUser) { %>
+  <%# Tiempo real (solo con sesión): cliente Socket.IO servido por la propia app + avisos de skills %>
+  <script src="/socket.io/socket.io.min.js" defer></script>
+  <script src="/js/realtime.js" defer></script>
+  <% } %>
   <% (locals.scripts || []).forEach((src) => { %>
   <script src="<%= src %>" defer></script>
   <% }) %>

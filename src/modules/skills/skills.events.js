@@ -6,11 +6,11 @@
 //   'skill:created'  payload: { id, nombre, categoria, nivelEsperado, importancia, por }
 //   'skill:updated'  payload: { id, nombre, categoria, nivelEsperado, importancia, por }
 //   (por = nombre del usuario que hizo el cambio)
+//   Segundo argumento (solo para el servidor, no se envía al navegador): { actorId }
+//   para que el módulo de tiempo real no le avise a quien hizo el cambio.
 //
-// Ejemplo de uso en src/server.js, donde ya existe `io`:
-//   const { skillEvents } = require('./modules/skills/skills.events');
-//   skillEvents.on('skill:created', (skill) => io.emit('skill:created', skill));
-//   skillEvents.on('skill:updated', (skill) => io.emit('skill:updated', skill));
+// El módulo de tiempo real se suscribe a estos eventos y los reenvía por Socket.IO
+// (namespace /notifications): ver src/modules/notifications/notifications.socket.js.
 const { EventEmitter } = require('events');
 
 const skillEvents = new EventEmitter();
@@ -31,7 +31,7 @@ function payload(skill, usuario) {
 // la skill ya se guardó, la notificación es secundaria.
 function notificar(evento, skill, usuario) {
   try {
-    skillEvents.emit(evento, payload(skill, usuario));
+    skillEvents.emit(evento, payload(skill, usuario), { actorId: usuario ? usuario.id : null });
   } catch (err) {
     console.error(`Error al notificar ${evento}:`, err);
   }

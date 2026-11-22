@@ -3,6 +3,8 @@
  * Solo se monta fuera de producción (ver app.js).
  */
 const express = require('express');
+const { requireAuth } = require('../../middlewares/auth.middleware');
+const { notificar } = require('../skills/skills.events');
 
 const router = express.Router();
 
@@ -44,6 +46,19 @@ router.get('/flash', (req, res) => {
 // Demostración del modal de confirmación (no elimina nada)
 router.post('/confirm-demo', (req, res) => {
   req.session.flash = { type: 'success', message: 'Confirmación recibida (demo): no se eliminó nada.' };
+  res.redirect('/ui-kit');
+});
+
+// Demostración de la notificación en tiempo real (Socket.IO): avisa a los DEMÁS usuarios
+// conectados como si se hubiera creado o actualizado una skill. Usa el mismo camino que el
+// CRUD (notificar -> skillEvents -> /notifications), pero no guarda nada en la BD.
+router.post('/notify-demo', requireAuth, (req, res) => {
+  const evento = req.body.action === 'updated' ? 'skill:updated' : 'skill:created';
+  notificar(evento, { id: 0, nombre: 'Skill de demostración' }, req.session.user);
+  req.session.flash = {
+    type: 'success',
+    message: 'Aviso enviado a los demás usuarios conectados (demo). Míralo desde otra ventana con otra cuenta.',
+  };
   res.redirect('/ui-kit');
 });
 
