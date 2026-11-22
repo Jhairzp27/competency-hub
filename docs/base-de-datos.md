@@ -107,3 +107,28 @@ npm run seed                  # carga el catálogo base
 ```
 
 > **Nota sobre `prisma migrate dev`:** como `user_sessions` existe en la BD pero no en el esquema de Prisma, `migrate dev` detecta "drift" y pide resetear la base. Para generar una migración nueva sin perder datos se puede usar `prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma --shadow-database-url <url_bd_sombra> --script` y aplicarla con `prisma migrate deploy`.
+
+## Medición: consultas con y sin índice
+
+Script reproducible: [`docs/sql/medicion-indices.sql`](sql/medicion-indices.sql).
+
+```bash
+docker exec -i skillbridge_db psql -U admin -d skillbridge < docs/sql/medicion-indices.sql
+```
+
+**Método.** Con 25 filas PostgreSQL siempre recorre la tabla completa, porque es más barato que usar un índice. Por eso el script, dentro de una transacción, inserta **100 000 skills sintéticas** (además de las 25 del seed), ejecuta `ANALYZE` y mide cada consulta con `EXPLAIN (ANALYZE, BUFFERS)`: primero con los índices y luego después de eliminarlos (`DROP INDEX`). Al final hace `ROLLBACK`, así que la base queda exactamente como estaba, y `VACUUM ANALYZE` limpia las filas muertas.
+
+**Entorno.** PostgreSQL 16.16 en Docker, en un portátil de desarrollo. Se hicieron 4 corridas; la primera, con caché fría, se descarta y se reporta la **mediana de las corridas 2 a 4**.
+
+| Consulta | Plan con índice | Con índice | Plan sin índice | Sin índice | Mejora |
+|---|---|---|---|---|---|
+| Búsqueda parcial `nombre ILIKE '%04242%'` (10 resultados) | Bitmap Index Scan en `skills_nombre_trgm_idx` | **2,4 ms** | Seq Scan (100 025 filas) | 61,1 ms | ≈ 25× |
+| Total para paginar: `count(*)` con `categoria` + `importancia` (10 717 filas) | Bitmap Index Scan en `skills_categoria_importancia_idx` | **5,1 ms** | Seq Scan | 10,4 ms | ≈ 2× |
+| Filtro `categoria` + `importancia` + búsqueda `ILIKE '%0424%'` | Bitmap Index Scan (trigramas o compuesto, según el planificador) | **3,1 ms** | Seq Scan | 75,1 ms | ≈ 24× |
+
+**Conclusiones.**
+
+- El índice **GIN de trigramas** es el que más aporta: sin él, cada búsqueda del listado lee las 100 000 filas, aunque devuelva 10. Con él, PostgreSQL va directo a las candidatas.
+- El índice **compuesto** mejora menos (≈ 2×) porque cada combinación categoría + importancia selecciona cerca del 11 % de la tabla. Igual se usa para calcular el total de páginas del listado filtrado.
+- En la consulta combinada, el planificador elige el índice más selectivo. Casi siempre es el de trigramas; en una de las corridas usó el compuesto (9,3 ms), que igual es mucho más rápido que el Seq Scan.
+- Con el volumen real de la PYME (decenas o cientos de skills) las consultas tardan menos de 1 ms con o sin índices. Los índices preparan el catálogo para crecer y cumplen el requisito de indexar los campos de búsqueda.
