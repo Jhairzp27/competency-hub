@@ -107,23 +107,27 @@ Además, la base de datos repite las reglas con tipos, enums, `UNIQUE` y restric
 
 ## Eventos para el tiempo real
 
-`src/modules/skills/skills.events.js` exporta `skillEvents` (un `EventEmitter`). El CRUD emite los eventos después de guardar correctamente:
+El CRUD no usa Socket.IO directamente. Después de guardar correctamente, llama a `notificar()` (`skills.events.js`), que emite un evento en `skillEvents`, un `EventEmitter` de Node. El módulo de tiempo real (Sergio) se suscribe a esos eventos y los reenvía a los navegadores. Así cada parte se puede probar por separado.
 
-| Evento | Cuándo | Payload |
-|---|---|---|
-| `skill:created` | Tras crear | `{ id, nombre, categoria, nivelEsperado, importancia, por }` |
-| `skill:updated` | Tras editar | `{ id, nombre, categoria, nivelEsperado, importancia, por }` |
-
-`por` es el nombre del usuario que hizo el cambio. Para reenviar los eventos a los usuarios conectados (módulo de tiempo real):
-
-```js
-// src/server.js
-const { skillEvents } = require('./modules/skills/skills.events');
-skillEvents.on('skill:created', (skill) => io.emit('skill:created', skill));
-skillEvents.on('skill:updated', (skill) => io.emit('skill:updated', skill));
+```mermaid
+flowchart LR
+  A["skills.controller<br/>crear / actualizar"] -- "notificar()" --> B["skillEvents<br/>(EventEmitter)"]
+  B --> C["notifications.socket.js<br/>namespace /notifications"]
+  C -- "Socket.IO, todos menos quien hizo el cambio" --> D["realtime.js<br/>toast en cualquier página"]
 ```
 
-Si un oyente lanza un error, se registra en la consola y la petición continúa: la skill ya se guardó.
+**Eventos que emite el CRUD** (en el servidor, `skillEvents`):
+
+| Evento | Cuándo | 1.er argumento (datos públicos) | 2.º argumento (solo servidor) |
+|---|---|---|---|
+| `skill:created` | Tras crear | `{ id, nombre, categoria, nivelEsperado, importancia, por }` | `{ actorId }` |
+| `skill:updated` | Tras editar | `{ id, nombre, categoria, nivelEsperado, importancia, por }` | `{ actorId }` |
+
+- `por` es el nombre de quien hizo el cambio. `actorId` es su id; el módulo de tiempo real lo usa para **no** avisarle a esa persona, que ya ve el mensaje flash de confirmación.
+- Si un oyente lanza un error, se registra en la consola y la petición continúa: la skill ya se guardó.
+- No se emiten eventos cuando la validación falla ni al eliminar.
+
+**Lo que recibe el navegador:** `src/modules/notifications/notifications.socket.js` reenvía cada evento por el namespace `/notifications` (con sesión obligatoria en el handshake) solo con `{ id, nombre, by, at }`, sin descripción ni ids de usuario. `src/public/js/realtime.js` lo muestra como un toast, por ejemplo: «Ana creó la skill «Docker»». Los detalles están en [tiempo-real.md](tiempo-real.md).
 
 ## Pruebas
 
