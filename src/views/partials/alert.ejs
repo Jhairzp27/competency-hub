@@ -5,7 +5,8 @@
   Variables:
     - type:     'success' | 'error' | 'warning' | 'info' (por defecto 'info')
     - title:    título opcional en negrita
-    - messages: texto, lista de textos o lista de errores de express-validator ({ msg })
+    - messages: texto, lista de textos o lista de errores de express-validator ({ msg }).
+                Si no hay mensajes (null, '' o []), la alerta no se muestra, aunque tenga título.
   Accesibilidad: error/aviso usan role="alert"; éxito/info usan role="status".
 %>
 <%
@@ -15,7 +16,8 @@
   const alertMessages = raw.map((m) => (typeof m === 'string' ? m : m && m.msg)).filter(Boolean);
   const alertRole = alertType === 'error' || alertType === 'warning' ? 'alert' : 'status';
 %>
-<% if (locals.title || alertMessages.length) { %>
+<%# Solo se muestra si hay al menos un mensaje (null, '' o [] no muestran nada). %>
+<% if (alertMessages.length) { %>
 <div class="alert alert-<%= alertType %>" role="<%= alertRole %>">
   <%- include('icon', { name: alertIcons[alertType], size: 20, label: null, className: 'alert-icon' }) %>
   <div class="alert-body">

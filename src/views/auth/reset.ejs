@@ -1,15 +1,39 @@
-<%- include('../partials/head', { title: 'Nueva contraseña' }) %>
-<main id="main" class="main">
-<div class="container">
-  <h1>Establecer nueva contraseña</h1>
-  <% if (errors.length) { %>
-    <ul><% errors.forEach(e => { %><li style="color:red;"><%= e.msg %></li><% }) %></ul>
-  <% } %>
-  <form action="/auth/reset/<%= token %>" method="POST">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <div><label>Nueva contraseña: <input type="password" name="password" required></label></div>
-    <button type="submit">Actualizar</button>
-  </form>
-</div>
+<%- include('../partials/head', { title: 'Nueva contraseña', description: 'Establece una nueva contraseña para tu cuenta de Competency Hub.' }) %>
+<main id="main" class="auth-layout">
+  <div class="auth-shell">
+    <%- include('../partials/auth-aside') %>
+
+    <section class="auth-panel" aria-labelledby="reset-title">
+      <header class="auth-header">
+        <span class="auth-header-icon"><%- include('../partials/icon', { name: 'lock', size: 24, label: null }) %></span>
+        <h1 id="reset-title">Nueva contraseña</h1>
+        <p>Elige una contraseña segura que no hayas usado antes.</p>
+      </header>
+
+      <%- include('../partials/alert', { type: 'error', title: 'No pudimos actualizar la contraseña', messages: errors }) %>
+
+      <form class="form" action="/auth/reset/<%= token %>" method="POST" data-validate data-error-summary>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="form-group">
+          <label class="form-label" for="password">Nueva contraseña</label>
+          <input class="form-control" id="password" name="password" type="password"
+            autocomplete="new-password" aria-describedby="password-requirements"
+            required minlength="8" maxlength="64" data-rule-uppercase data-rule-digit
+            data-msg-required="La nueva contraseña es obligatoria."
+            data-msg-length="La nueva contraseña debe tener entre 8 y 64 caracteres."
+            data-msg-uppercase="Debe incluir al menos una letra mayúscula."
+            data-msg-digit="Debe incluir al menos un número.">
+          <%- include('../partials/password-checklist', { inputId: 'password' }) %>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit">Guardar nueva contraseña</button>
+      </form>
+
+      <p class="auth-switch">
+        <a href="/auth/login"><%- include('../partials/icon', { name: 'arrow-left', size: 16, label: null }) %> Volver a iniciar sesión</a>
+      </p>
+    </section>
+  </div>
 </main>
-<%- include('../partials/footer') %>
+<%- include('../partials/footer', { scripts: ['/js/form-validation.js', '/js/password-checklist.js'] }) %>
