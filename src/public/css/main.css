@@ -1648,8 +1648,28 @@ select.form-control {
   border-bottom: 1px solid var(--color-border);
 }
 
-.chat-header h2 {
+.chat-header h2,
+.chat-aside-title {
   font-size: var(--text-lg);
+}
+
+/* Panel «Conectados»: en móvil va arriba y compacto (en fila) para verse sin hacer scroll */
+.chat-aside {
+  order: -1;
+  padding: var(--space-md);
+}
+
+.chat-aside-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.chat-aside .online-users {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0 var(--space-md);
 }
 
 .chat-messages {
@@ -1781,6 +1801,20 @@ select.form-control {
   .chat {
     grid-template-columns: 1fr 280px;
     align-items: start;
+  }
+
+  .chat-aside {
+    order: 0;
+    padding: var(--space-lg);
+  }
+
+  .chat-aside-title {
+    margin-bottom: var(--space-md);
+  }
+
+  .chat-aside .online-users {
+    flex-direction: column;
+    gap: var(--space-xs);
   }
 }
 
