@@ -138,6 +138,69 @@ npm test
 
 74 pruebas en 5 suites: validación y autenticación, CRUD de skills (integración con la base de datos), validación del chat y WebSocket. Detalle en [docs/skills.md](docs/skills.md) y [docs/tiempo-real.md](docs/tiempo-real.md).
 
+## Arquitectura del monolito
+
+Todo corre en **un solo proceso de Node.js**: Express renderiza las vistas EJS y resuelve las rutas en el servidor, y Socket.IO comparte el mismo servidor HTTP y la misma sesión.
+
+```mermaid
+flowchart LR
+  B["Navegador<br/>HTML + CSS + JS"]
+
+  subgraph M["Monolito Node.js (un solo proceso desplegable)"]
+    direction TB
+    E["Express 5<br/>Helmet · sesión · CSRF"]
+    R["Rutas y controladores<br/>auth · skills · chat · ui-kit"]
+    V["Vistas EJS<br/>partials compartidos"]
+    SV["Validación y servicios<br/>express-validator · bcrypt"]
+    EV["Eventos de skills<br/>skill:created / skill:updated"]
+    S["Socket.IO<br/>namespaces /chat y /notifications"]
+    E --> R
+    R --> V
+    R --> SV
+    SV --> EV
+    EV --> S
+  end
+
+  P["Prisma ORM"]
+  DB[("PostgreSQL 16<br/>users · password_reset_tokens<br/>skills · chat_messages · user_sessions")]
+
+  B -- "HTTP: páginas y formularios" --> E
+  B <-->|"WebSocket (handshake con la cookie de sesión)"| S
+  SV --> P
+  S --> P
+  P --> DB
+  E -- "sesiones (connect-pg-simple)" --> DB
+```
+
+- **Capa de presentación:** vistas EJS con partials compartidos (`head`, `navbar`, `footer`, alertas, tabla, paginación, modal, chat) y un sistema de diseño propio ([MASTER.md](design-system/competency-hub/MASTER.md)).
+- **Capa de negocio:** módulos `auth`, `skills`, `chat` y `notifications`, cada uno con rutas, controlador y validación.
+- **Tiempo real:** el CRUD de skills emite eventos y el módulo de notificaciones los reenvía por Socket.IO; así cada módulo se prueba por separado ([docs/tiempo-real.md](docs/tiempo-real.md)).
+- **Persistencia:** PostgreSQL con Prisma (consultas parametrizadas) e índices en los campos de búsqueda ([docs/base-de-datos.md](docs/base-de-datos.md)).
+
+## Equipo y roles
+
+| Integrante | Rol | Responsabilidades |
+|---|---|---|
+| Jhair Zambrano | Arquitectura base, autenticación y seguridad | Estructura de Express, conexión a la base de datos, `.env.example`, registro, inicio de sesión, recuperación de clave, rutas protegidas y defensas contra inyección, XSS y CSRF |
+| Isaac Proaño | Base de datos y CRUD del catálogo | Esquema documentado e índices, seed, CRUD completo de Skill con paginación y filtros, validación en el servidor |
+| Sergio Rodríguez | Tiempo real y pruebas | Socket.IO con handshake autenticado, chat con historial y usuarios conectados, notificación de cambios en skills, pruebas automatizadas |
+| Daniel Moncayo | Vistas (UI/UX), validación en cliente y entregables | Sistema de diseño, navegación y estilo de todas las pantallas, validación en el cliente, medición de rendimiento, README y presentación |
+
+El trabajo se hizo con una rama por funcionalidad y *pull requests* revisados antes de fusionar en `main`.
+
+## Uso de IA
+
+El equipo declara el uso de herramientas de inteligencia artificial como **apoyo**, según la guía del proyecto. Todo lo generado o sugerido fue revisado, probado y comprendido por cada autor, que puede explicarlo y modificarlo en la defensa.
+
+| Integrante | Herramienta | Detalle |
+|---|---|---|
+| Jhair | — | Pendiente de completar por Jhair |
+| Isaac | Claude Code (Anthropic) | Ver [Uso de IA (Isaac)](#uso-de-ia-isaac) |
+| Sergio | Claude Code (Anthropic, Claude Opus 5.5) | Ver [Uso de IA (Sergio)](#uso-de-ia-sergio) |
+| Daniel | Claude Code (Anthropic, Claude Opus 5.5) y la skill [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | Ver [Uso de IA (Daniel)](#uso-de-ia-daniel) |
+
+Los commits hechos con asistencia de IA incluyen la línea `Co-Authored-By` correspondiente.
+
 ---
 
 # Detalle por módulo
@@ -194,3 +257,31 @@ Se usó **Claude Code** (Anthropic, modelo Claude Opus 5.5) como asistente en es
 - Preparar el entorno local (Node.js, Docker y migraciones).
 
 Todo lo generado fue revisado, probado (pruebas automatizadas y pruebas manuales con dos navegadores) y comprendido por el autor, que puede explicarlo y modificarlo en la defensa.
+
+## Interfaz (UI/UX), validación en el cliente y entregables — Daniel
+
+**Responsabilidades:** menú de navegación coherente y estilo de todas las pantallas EJS (login, registro, recuperación, pantalla principal, CRUD con confirmación al eliminar y chat), validación en el cliente de todos los formularios, medición de rendimiento, README, presentación y etiqueta `v1.0-b1`.
+
+**Qué incluye:**
+- **Sistema de diseño** ([design-system/competency-hub/MASTER.md](design-system/competency-hub/MASTER.md)): paleta con contraste WCAG AA verificado, tipografía Fira Sans / Fira Code, espaciados, componentes, reglas de UX y accesibilidad, y checklist de entrega.
+- **CSS global** ([src/public/css/main.css](src/public/css/main.css)) basado en variables, sin frameworks; responsive desde 375 px y con soporte de `prefers-reduced-motion`.
+- **Partials reutilizables** en `src/views/partials/`: `head`, `navbar` (enlace activo y menú móvil), `footer`, `icon` (iconos SVG Lucide), `alert` y `flash`, `pagination`, `level`, `confirm-dialog`, `chat-message`, `password-checklist` y `auth-aside`.
+- **JavaScript del cliente** en `src/public/js/`:
+  - `form-validation.js`: validación reutilizable con `data-validate`. Lee las reglas de los atributos HTML (las mismas del servidor), muestra el error junto al campo, un resumen enfocable con enlaces y evita el doble envío.
+  - `confirm-dialog.js`: modal nativo `<dialog>` para eliminar (foco inicial en «Cancelar», Esc, POST con CSRF).
+  - `toast.js`, `chat-ui.js`, `nav.js` y `password-checklist.js`.
+- **Páginas 404 y 500** sin exponer detalles internos.
+- **`/ui-kit`** (solo en desarrollo): muestra cada componente funcionando con su código de uso.
+
+**Accesibilidad:** etiquetas visibles en todos los campos, `aria-invalid` y `aria-describedby` en los errores, foco visible, enlace «Saltar al contenido», áreas táctiles de 44 px y estados que no dependen solo del color.
+
+### Uso de IA (Daniel)
+
+Se usó **Claude Code** (Anthropic, modelo Claude Opus 5.5) como asistente con estos propósitos:
+
+- Planificar las ramas y los commits de mi parte.
+- Generar el sistema de diseño con la skill **ui-ux-pro-max** y ajustarlo al proyecto (la propuesta inicial tenía paleta oscura y animaciones de *landing*, que se descartaron).
+- Generar y revisar el CSS, los partials EJS, el JavaScript del cliente y la validación en el cliente.
+- Probar cada pantalla en el navegador (escritorio y móvil), revisar el contraste y la accesibilidad, y redactar este README.
+
+Todo fue revisado y probado por el autor en el navegador antes de cada commit, y puede explicarlo y modificarlo en la defensa.
