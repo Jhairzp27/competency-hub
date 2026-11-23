@@ -1370,14 +1370,26 @@ select.form-control {
   color: var(--color-muted-foreground);
 }
 
-/* En móvil solo se muestran las flechas, sin texto */
+/* En móvil solo se ven las flechas: el texto queda oculto visualmente pero
+   disponible para lectores de pantalla (con display: none el enlace se quedaba sin nombre) */
 .pagination-text {
-  display: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 @media (min-width: 640px) {
   .pagination-text {
-    display: inline;
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
   }
 }
 
