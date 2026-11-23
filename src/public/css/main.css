@@ -1144,6 +1144,9 @@ select.form-control {
    Tabla
    -------------------------------------------------------------------------- */
 .table-wrapper {
+  /* position: relative hace que los elementos con position: absolute de la tabla
+     (p. ej. .sr-only en encabezados) queden dentro del scroll y no estiren la página */
+  position: relative;
   width: 100%;
   overflow-x: auto;
   background-color: var(--color-card);
