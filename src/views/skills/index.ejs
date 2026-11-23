@@ -2,14 +2,14 @@
 <main id="main" class="main">
 <div class="container stack">
   <header class="page-header">
-    <h1>Catálogo de skills</h1>
-    <p>Competencias técnicas y conductuales que la consultora espera de su equipo.</p>
-    <p>
-      <a class="btn btn-primary" href="/skills/nueva">
-        <%- include('../partials/icon', { name: 'plus', label: null }) %>
-        <span>Nueva skill</span>
-      </a>
-    </p>
+    <div>
+      <h1>Catálogo de skills</h1>
+      <p>Competencias técnicas y conductuales que la consultora espera de su equipo.</p>
+    </div>
+    <a class="btn btn-primary" href="/skills/nueva">
+      <%- include('../partials/icon', { name: 'plus', label: null }) %>
+      <span>Nueva skill</span>
+    </a>
   </header>
 
   <%- include('../partials/flash') %>
@@ -66,7 +66,7 @@
               <td class="cell-title"><a href="/skills/<%= skill.id %>"><%= skill.nombre %></a></td>
               <td><span class="badge <%= skill.categoria === 'TECNICA' ? 'badge-technical' : 'badge-behavioral' %>"><%= etiquetaCategoria(skill.categoria) %></span></td>
               <td><%- include('../partials/level', { level: skill.nivelEsperado }) %></td>
-              <td><span class="badge<%= ['ALTA', 'CRITICA'].includes(skill.importancia) ? ' badge-high' : '' %>"><%= etiquetaImportancia(skill.importancia) %></span></td>
+              <td><span class="badge<%= skill.importancia === 'CRITICA' ? ' badge-critical' : skill.importancia === 'ALTA' ? ' badge-high' : '' %>"><%= etiquetaImportancia(skill.importancia) %></span></td>
               <td class="cell-actions">
                 <div class="table-actions">
                   <a class="btn btn-ghost btn-icon" href="/skills/<%= skill.id %>" aria-label="Ver <%= skill.nombre %>"><%- include('../partials/icon', { name: 'eye', label: null }) %></a>
