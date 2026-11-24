@@ -272,6 +272,7 @@ Todo lo generado fue revisado, probado (pruebas automatizadas y pruebas manuales
   - `toast.js`, `chat-ui.js`, `nav.js` y `password-checklist.js`.
 - **Páginas 404 y 500** sin exponer detalles internos.
 - **`/ui-kit`** (solo en desarrollo): muestra cada componente funcionando con su código de uso.
+- **Rendimiento** ([docs/rendimiento.md](docs/rendimiento.md)): medición con Lighthouse antes y después de optimizar (compresión, caché de estáticos y fuentes propias) y arreglos de accesibilidad. Todas las pantallas quedan entre 97 y 100 en rendimiento y en 100 en accesibilidad, buenas prácticas y SEO.
 
 **Accesibilidad:** etiquetas visibles en todos los campos, `aria-invalid` y `aria-describedby` en los errores, foco visible, enlace «Saltar al contenido», áreas táctiles de 44 px y estados que no dependen solo del color.
 
