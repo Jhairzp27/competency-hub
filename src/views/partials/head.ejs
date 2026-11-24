@@ -16,9 +16,10 @@
   <meta name="theme-color" content="#0F172A">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap">
+  <%# Fuentes servidas por la propia app (src/public/fonts): sin petición a Google Fonts que bloquee el renderizado.
+      Se precargan las dos más usadas (texto 400 y títulos 700); el resto se carga al necesitarse. %>
+  <link rel="preload" href="/fonts/fira-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/fira-sans-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 
   <link rel="stylesheet" href="/css/main.css">
 </head>

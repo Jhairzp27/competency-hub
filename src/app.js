@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
+const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const { sessionMiddleware } = require('./config/session');
 const { generateCsrfToken, verifyCsrfToken } = require('./middlewares/csrf.middleware');
@@ -13,13 +14,29 @@ const app = express();
 
 app.use(helmet({ contentSecurityPolicy: false }));
 
+// Rendimiento: comprime (gzip/deflate) HTML, CSS y JS. Medido con Lighthouse en docs/rendimiento.md
+app.use(compression());
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+// Archivos estáticos con caché: en producción el navegador reutiliza CSS, JS e imágenes
+// durante 7 días (revalida con ETag); en desarrollo no se cachea para ver los cambios al instante.
+// Las fuentes nunca cambian de contenido, así que se cachean un año como inmutables.
+const isProduction = process.env.NODE_ENV === 'production';
+app.use(
+  express.static(path.join(__dirname, 'public'), {
+    maxAge: isProduction ? '7d' : 0,
+    setHeaders: (res, filePath) => {
+      if (/\.woff2$/.test(filePath)) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    },
+  })
+);
 
 app.use(sessionMiddleware);
 app.use(generateCsrfToken);

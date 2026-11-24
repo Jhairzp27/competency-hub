@@ -49,14 +49,14 @@ Contraste verificado (texto sobre `#FFFFFF` / `#F8FAFC`): acento 5.9 / 5.7, text
 
 ## 3. Tipografía
 
-- **Texto general y títulos:** *Fira Sans* (300, 400, 500, 600, 700).
+- **Texto general y títulos:** *Fira Sans* (400, 500, 600, 700).
 - **Datos técnicos:** *Fira Code* (400, 500, 600) — solo para nivel de la skill, IDs, etiquetas técnicas y horas del chat.
-- **Carga:** Google Fonts con `preconnect` y `display=swap` (evita texto invisible y mejora Lighthouse).
+- **Carga:** archivos `.woff2` servidos por la propia app desde `src/public/fonts/` (subconjunto *latin*, licencia SIL OFL 1.1), declarados con `@font-face` y `font-display: swap` al inicio de `main.css`. Se precargan Fira Sans 400 y 700 en `partials/head.ejs`.
+- **Por qué no Google Fonts:** su hoja de estilos externa bloqueaba el renderizado (Lighthouse estimaba de 0.8 a 1.3 s de ahorro); ver `docs/rendimiento.md`.
 
 ```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/fira-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fira-sans-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 ```
 
 | Token | Valor | Uso |

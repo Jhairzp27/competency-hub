@@ -17,7 +17,8 @@
           <span class="badge badge-success"><span data-online-count>0</span>&nbsp;en línea</span>
         </div>
 
-        <ul class="chat-messages" role="log" aria-live="polite" aria-label="Mensajes de la sala general" data-chat-messages>
+        <%# Sin role="log": no está permitido en <ul> y rompía la semántica de la lista. aria-live="polite" ya anuncia los mensajes nuevos. %>
+        <ul class="chat-messages" aria-live="polite" aria-label="Mensajes de la sala general" data-chat-messages>
           <% if (messages.length === 0) { %>
             <li class="chat-system" data-chat-empty>Aún no hay mensajes. Escribe el primero.</li>
           <% } %>

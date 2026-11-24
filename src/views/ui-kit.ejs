@@ -198,7 +198,7 @@ notificar('skill:created', skill, req.session.user); // o 'skill:updated'
             <h3>Sala general</h3>
             <span class="badge badge-success"><span data-online-count><%= sampleUsers.length %></span>&nbsp;en línea</span>
           </div>
-          <ul class="chat-messages" role="log" aria-live="polite" aria-label="Mensajes de la sala general" data-chat-messages>
+          <ul class="chat-messages" aria-live="polite" aria-label="Mensajes de la sala general" data-chat-messages>
             <li class="chat-system">Ana Torres se unió al chat</li>
             <% sampleMessages.forEach((m) => { %>
               <%- include('partials/chat-message', { message: m, own: m.own }) %>
