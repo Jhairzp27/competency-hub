@@ -2,7 +2,7 @@
 <%- include('../partials/head', { title: `Eliminar «${skill.nombre}»` }) %>
 <main id="main" class="main">
 <div class="container stack">
-  <p><a href="/skills/<%= skill.id %>">&larr; Volver al detalle</a></p>
+  <a class="back-link" href="/skills/<%= skill.id %>"><%- include('../partials/icon', { name: 'arrow-left', size: 18, label: null }) %> Volver al detalle</a>
 
   <div class="card stack">
     <%- include('../partials/alert', { type: 'warning', title: `¿Eliminar la skill «${skill.nombre}»?`, messages: 'Se eliminará del catálogo. Esta acción no se puede deshacer.' }) %>

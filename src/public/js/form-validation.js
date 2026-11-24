@@ -11,6 +11,8 @@
  *   type="number"       solo números; min/max para el rango
  *   data-rule-integer   número entero
  *   pattern             expresión regular
+ *   data-pattern        expresión regular Unicode (bandera «u»: admite \p{L}); úsala
+ *                       en lugar de pattern cuando la regla del servidor usa \p{...}
  *   data-rule-uppercase al menos una mayúscula
  *   data-rule-digit     al menos un número
  *   data-rule-match="#id"  debe coincidir con otro campo
@@ -98,8 +100,11 @@
       }
     }
 
+    // data-pattern tiene prioridad: se compila con la bandera «u» (admite \p{L}, letras con tildes y ñ)
+    const unicodePattern = field.dataset.pattern;
+    if (unicodePattern && !new RegExp('^(?:' + unicodePattern + ')$', 'u').test(value)) return message(field, 'pattern');
     const pattern = field.getAttribute('pattern');
-    if (pattern && !new RegExp('^(?:' + pattern + ')$').test(value)) return message(field, 'pattern');
+    if (!unicodePattern && pattern && !new RegExp('^(?:' + pattern + ')$').test(value)) return message(field, 'pattern');
 
     if (field.dataset.ruleUppercase !== undefined && !/[A-ZÁÉÍÓÚÑ]/.test(value)) return message(field, 'uppercase');
     if (field.dataset.ruleDigit !== undefined && !/[0-9]/.test(value)) return message(field, 'digit');

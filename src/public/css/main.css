@@ -1144,6 +1144,9 @@ select.form-control {
    Tabla
    -------------------------------------------------------------------------- */
 .table-wrapper {
+  /* position: relative hace que los elementos con position: absolute de la tabla
+     (p. ej. .sr-only en encabezados) queden dentro del scroll y no estiren la página */
+  position: relative;
   width: 100%;
   overflow-x: auto;
   background-color: var(--color-card);
@@ -1251,6 +1254,80 @@ select.form-control {
 .badge-success {
   background-color: var(--color-success-soft);
   color: var(--color-success);
+}
+
+/* Importancia crítica: relleno sólido para distinguirla de «Alta» */
+.badge-critical {
+  background-color: var(--color-destructive-hover);
+  color: var(--color-on-destructive);
+}
+
+/* --------------------------------------------------------------------------
+   Detalle de un registro y enlace «Volver»
+   -------------------------------------------------------------------------- */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  align-self: flex-start;
+  min-height: var(--touch-target);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.detail-header {
+  margin-bottom: 0;
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+.detail-item dt {
+  margin-bottom: var(--space-xs);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-muted-foreground);
+}
+
+.detail-item dd {
+  margin: 0;
+  color: var(--color-foreground);
+}
+
+.detail-text {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  max-width: 70ch;
+}
+
+.detail-actions {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+@media (min-width: 768px) {
+  .detail-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .detail-item-wide {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .detail-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .level {
@@ -1571,8 +1648,28 @@ select.form-control {
   border-bottom: 1px solid var(--color-border);
 }
 
-.chat-header h2 {
+.chat-header h2,
+.chat-aside-title {
   font-size: var(--text-lg);
+}
+
+/* Panel «Conectados»: en móvil va arriba y compacto (en fila) para verse sin hacer scroll */
+.chat-aside {
+  order: -1;
+  padding: var(--space-md);
+}
+
+.chat-aside-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.chat-aside .online-users {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0 var(--space-md);
 }
 
 .chat-messages {
@@ -1704,6 +1801,20 @@ select.form-control {
   .chat {
     grid-template-columns: 1fr 280px;
     align-items: start;
+  }
+
+  .chat-aside {
+    order: 0;
+    padding: var(--space-lg);
+  }
+
+  .chat-aside-title {
+    margin-bottom: var(--space-md);
+  }
+
+  .chat-aside .online-users {
+    flex-direction: column;
+    gap: var(--space-xs);
   }
 }
 
