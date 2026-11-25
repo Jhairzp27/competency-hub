@@ -111,6 +111,7 @@ El archivo `.env` **no se sube al repositorio** (está en `.gitignore`); solo se
 | `npm start` | Inicia el servidor sin recarga |
 | `npm run seed` | Carga o actualiza el catálogo base de skills |
 | `npm test` | Ejecuta las pruebas automatizadas (Jest) |
+| `node scripts/e2e.js <log>` | Prueba E2E contra un servidor en ejecución (ver [docs/pruebas-e2e.md](docs/pruebas-e2e.md)) |
 
 ## Estructura del proyecto
 
@@ -118,6 +119,7 @@ El archivo `.env` **no se sube al repositorio** (está en `.gitignore`); solo se
 ├── design-system/competency-hub/MASTER.md   # Sistema de diseño (colores, tipografía, componentes, reglas de UX)
 ├── docs/                                     # Documentación de base de datos, skills, tiempo real y rendimiento
 ├── prisma/                                   # Esquema, migraciones y seed
+├── scripts/e2e.js                            # Prueba E2E contra el servidor en ejecución
 ├── src/
 │   ├── app.js            # Express: middlewares, rutas y manejo de errores
 │   ├── server.js         # Servidor HTTP + Socket.IO
@@ -137,6 +139,8 @@ npm test
 ```
 
 74 pruebas en 5 suites: validación y autenticación, CRUD de skills (integración con la base de datos), validación del chat y WebSocket. Detalle en [docs/skills.md](docs/skills.md) y [docs/tiempo-real.md](docs/tiempo-real.md).
+
+**Prueba E2E** contra el servidor en ejecución ([`scripts/e2e.js`](scripts/e2e.js)): registro, inicio de sesión con hash bcrypt verificado en la BD, rutas protegidas, recuperación de clave (un solo uso y caducidad), CRUD completo con paginación y filtros, chat con dos usuarios por WebSocket, notificaciones en tiempo real, CSRF y cabeceras de Helmet. Resultado: **67/67**. Reporte y forma de ejecutarla en [docs/pruebas-e2e.md](docs/pruebas-e2e.md).
 
 ## Arquitectura del monolito
 
@@ -177,6 +181,47 @@ flowchart LR
 - **Tiempo real:** el CRUD de skills emite eventos y el módulo de notificaciones los reenvía por Socket.IO; así cada módulo se prueba por separado ([docs/tiempo-real.md](docs/tiempo-real.md)).
 - **Persistencia:** PostgreSQL con Prisma (consultas parametrizadas) e índices en los campos de búsqueda ([docs/base-de-datos.md](docs/base-de-datos.md)).
 
+### Modelo de datos
+
+```mermaid
+erDiagram
+  users ||--o{ password_reset_tokens : "tiene"
+  users |o--o{ skills : "crea"
+  users ||--o{ chat_messages : "escribe"
+
+  users {
+    int id PK
+    varchar name
+    varchar email UK
+    text password_hash "bcrypt"
+  }
+  password_reset_tokens {
+    int id PK
+    text token_hash UK "SHA-256"
+    int user_id FK
+    timestamp expires_at "15 min"
+    boolean used "un solo uso"
+  }
+  skills {
+    int id PK
+    varchar nombre UK "índice GIN trigramas"
+    enum categoria "índice (categoria, importancia)"
+    smallint nivel_esperado
+    enum importancia
+    varchar descripcion
+    int created_by_id FK
+  }
+  chat_messages {
+    int id PK
+    varchar content
+    varchar room "índice (room, created_at)"
+    int user_id FK
+    timestamp created_at
+  }
+```
+
+Diagrama completo, índices y medición con y sin índice en [docs/base-de-datos.md](docs/base-de-datos.md); flujo de Socket.IO en [docs/tiempo-real.md](docs/tiempo-real.md).
+
 ## Equipo y roles
 
 | Integrante | Rol | Responsabilidades |
@@ -190,11 +235,18 @@ El trabajo se hizo con una rama por funcionalidad y *pull requests* revisados an
 
 ## Uso de IA
 
-El equipo declara el uso de herramientas de inteligencia artificial como **apoyo**, según la guía del proyecto. Todo lo generado o sugerido fue revisado, probado y comprendido por cada autor, que puede explicarlo y modificarlo en la defensa.
+En cumplimiento de las normas de integridad académica de la EPN, el equipo declara que usó herramientas de inteligencia artificial generativa **como apoyo**, no como sustituto del trabajo propio:
 
-| Integrante | Herramienta | Detalle |
+| Herramienta | Proveedor | Para qué se usó |
 |---|---|---|
-| Jhair | — | Pendiente de completar por Jhair |
+| **Gemini** | Google | Planificación de la arquitectura del monolito, reparto de tareas entre los integrantes, diseño inicial de la autenticación y la seguridad (hash, sesiones, CSRF, recuperación de clave) y resolución de errores del entorno (Node.js, Docker, PostgreSQL y Prisma). |
+| **Claude** (Claude Code, modelo Claude Opus 5.5) | Anthropic | Pruebas E2E del sistema, revisión de calidad del código, documentación (README y `docs/`) y estructuración de la presentación de la defensa. También como asistente de programación en cada módulo, según el detalle por integrante. |
+
+**Declaración del equipo.** Todo el código y la documentación generados o sugeridos por estas herramientas fueron **revisados, probados y comprendidos por los 4 integrantes** (Jhair Zambrano, Isaac Proaño, Sergio Rodríguez y Daniel Moncayo). Cada integrante puede explicar y modificar su parte en la defensa. Las decisiones finales de diseño, las correcciones y la verificación (pruebas automatizadas, prueba E2E y pruebas manuales en el navegador) fueron responsabilidad del equipo.
+
+| Integrante | Herramientas | Detalle |
+|---|---|---|
+| Jhair | Gemini y Claude Code | Arquitectura base, autenticación y seguridad planificadas con apoyo de Gemini; prueba E2E, revisión de calidad (activación de la Content-Security-Policy) y presentación con Claude Code |
 | Isaac | Claude Code (Anthropic) | Ver [Uso de IA (Isaac)](#uso-de-ia-isaac) |
 | Sergio | Claude Code (Anthropic, Claude Opus 5.5) | Ver [Uso de IA (Sergio)](#uso-de-ia-sergio) |
 | Daniel | Claude Code (Anthropic, Claude Opus 5.5) y la skill [ui-ux-pro-max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | Ver [Uso de IA (Daniel)](#uso-de-ia-daniel) |
