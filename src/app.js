@@ -12,7 +12,20 @@ const { requireAuth } = require('./middlewares/auth.middleware');
 
 const app = express();
 
-app.use(helmet({ contentSecurityPolicy: false }));
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Cabeceras de seguridad. La CSP solo permite recursos del propio origen ('self'):
+// no hay scripts ni estilos en línea, las fuentes son propias y el WebSocket va al mismo host.
+// upgrade-insecure-requests solo en producción (en desarrollo se usa http://localhost).
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        upgradeInsecureRequests: isProduction ? [] : null,
+      },
+    },
+  })
+);
 
 // Rendimiento: comprime (gzip/deflate) HTML, CSS y JS. Medido con Lighthouse en docs/rendimiento.md
 app.use(compression());
@@ -26,7 +39,6 @@ app.use(cookieParser());
 // Archivos estáticos con caché: en producción el navegador reutiliza CSS, JS e imágenes
 // durante 7 días (revalida con ETag); en desarrollo no se cachea para ver los cambios al instante.
 // Las fuentes nunca cambian de contenido, así que se cachean un año como inmutables.
-const isProduction = process.env.NODE_ENV === 'production';
 app.use(
   express.static(path.join(__dirname, 'public'), {
     maxAge: isProduction ? '7d' : 0,
