@@ -52,3 +52,6 @@ desktop.ini
 # --- Temporales ---
 tmp/
 *.tmp
+
+# --- Credenciales locales de demo ---
+*.local.md
