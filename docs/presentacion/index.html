@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Competency Hub · Primer Bimestre</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230F172A'/%3E%3Cpath d='M9 21.5 14 16l-5-5.5M16.5 22h6.5' fill='none' stroke='%2338BDF8' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+@font-face { font-family: 'Fira Sans'; src: url(fonts/fira-sans-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Fira Sans'; src: url(fonts/fira-sans-latin-500-normal.woff2) format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Fira Sans'; src: url(fonts/fira-sans-latin-600-normal.woff2) format('woff2'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Fira Sans'; src: url(fonts/fira-sans-latin-700-normal.woff2) format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Fira Code'; src: url(fonts/fira-code-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Fira Code'; src: url(fonts/fira-code-latin-500-normal.woff2) format('woff2'); font-weight: 500; font-display: swap; }
+
+:root {
+  --bg: #070D1A;
+  --bg2: #0B1426;
+  --panel: #0F1B31;
+  --panel2: #132340;
+  --line: #1E3150;
+  --text: #E6EDF7;
+  --muted: #8FA3BF;
+  --sky: #38BDF8;
+  --blue: #3B82F6;
+  --indigo: #818CF8;
+  --green: #34D399;
+  --amber: #FBBF24;
+  --rose: #FB7185;
+  --mono: 'Fira Code', Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: #03060D; overflow: hidden; }
+body { font-family: 'Fira Sans', 'Segoe UI', system-ui, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+/* ---------- Escenario 16:9 escalado ---------- */
+#stage { position: absolute; width: 1600px; height: 900px; left: 50%; top: 50%; transform-origin: center; }
+.slide {
+  position: absolute; inset: 0; padding: 64px 84px 70px;
+  background:
+    radial-gradient(1100px 600px at 100% 0%, rgba(56,189,248,.10), transparent 60%),
+    radial-gradient(900px 600px at 0% 100%, rgba(129,140,248,.10), transparent 60%),
+    linear-gradient(180deg, var(--bg2), var(--bg));
+  opacity: 0; visibility: hidden; transform: scale(1.02);
+  transition: opacity .6s ease, transform .8s cubic-bezier(.2,.7,.2,1), visibility 0s .6s;
+  overflow: hidden;
+}
+.slide::before { /* rejilla sutil */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(148,163,184,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 50% 40%, #000 30%, transparent 80%);
+}
+.slide.active { opacity: 1; visibility: visible; transform: none; transition: opacity .6s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+.slide.prev { transform: scale(.98); }
+.slide > * { position: relative; }
+
+/* Revelado escalonado */
+.r { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 110ms + 180ms); }
+.r.l { transform: translateX(-40px); }
+.r.rt { transform: translateX(40px); }
+.r.z { transform: scale(.92); }
+.slide.active .r { opacity: 1; transform: none; }
+
+/* ---------- Tipografía ---------- */
+.kicker { font-family: var(--mono); font-size: 18px; color: var(--sky); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+.kicker::before { content: ''; width: 28px; height: 2px; background: var(--sky); border-radius: 2px; }
+h1 { font-size: 84px; line-height: 1.02; font-weight: 700; letter-spacing: -.02em; }
+h2 { font-size: 50px; line-height: 1.08; font-weight: 700; letter-spacing: -.015em; margin-bottom: 30px; }
+h3 { font-size: 26px; font-weight: 600; margin-bottom: 10px; }
+p, li { font-size: 24px; line-height: 1.45; color: #C9D6E8; }
+.muted { color: var(--muted); }
+.grad { background: linear-gradient(90deg, var(--sky), var(--indigo)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+code, .mono { font-family: var(--mono); }
+code { font-size: .86em; background: rgba(56,189,248,.10); color: #BAE6FD; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(56,189,248,.18); }
+b, strong { color: #fff; font-weight: 600; }
+
+/* ---------- Componentes ---------- */
+.card { background: linear-gradient(180deg, rgba(19,35,64,.85), rgba(15,27,49,.85)); border: 1px solid var(--line); border-radius: 18px; padding: 26px 28px; box-shadow: 0 20px 50px -25px rgba(0,0,0,.6); }
+.card p, .card li { font-size: 21px; }
+.icon { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; margin-bottom: 16px; background: rgba(56,189,248,.12); color: var(--sky); border: 1px solid rgba(56,189,248,.25); }
+.icon svg { width: 28px; height: 28px; }
+.icon.i { background: rgba(129,140,248,.12); color: var(--indigo); border-color: rgba(129,140,248,.25); }
+.icon.g { background: rgba(52,211,153,.12); color: var(--green); border-color: rgba(52,211,153,.25); }
+.icon.a { background: rgba(251,191,36,.12); color: var(--amber); border-color: rgba(251,191,36,.25); }
+.icon.ro { background: rgba(251,113,133,.12); color: var(--rose); border-color: rgba(251,113,133,.25); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 17px; padding: 6px 14px; border-radius: 999px; background: rgba(56,189,248,.10); border: 1px solid rgba(56,189,248,.3); color: #BAE6FD; }
+.chip.g { background: rgba(52,211,153,.1); border-color: rgba(52,211,153,.35); color: #A7F3D0; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; box-shadow: 0 0 12px currentColor; }
+
+/* Ventana de navegador para capturas */
+.browser { border-radius: 14px; overflow: hidden; background: #fff; border: 1px solid #2A3F63; box-shadow: 0 40px 80px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.03); }
+.browser .bar { height: 34px; background: #1B2A45; display: flex; align-items: center; gap: 8px; padding: 0 14px; }
+.browser .bar i { width: 11px; height: 11px; border-radius: 50%; background: #FB7185; }
+.browser .bar i:nth-child(2) { background: #FBBF24; } .browser .bar i:nth-child(3) { background: #34D399; }
+.browser .bar span { margin-left: 14px; flex: 1; height: 22px; border-radius: 6px; background: #0F1B31; color: #8FA3BF; font: 13px var(--mono); display: flex; align-items: center; padding: 0 10px; }
+.browser img { display: block; width: 100%; }
+.cap { margin-top: 12px; font-size: 18px; color: var(--muted); text-align: center; }
+
+/* Terminal */
+.term { background: #0A0F1A; border: 1px solid #22324F; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 70px -30px rgba(0,0,0,.8); }
+.term .bar { height: 34px; background: #121B2D; display: flex; align-items: center; gap: 8px; padding: 0 14px; font: 14px var(--mono); color: #8FA3BF; }
+.term .bar i { width: 11px; height: 11px; border-radius: 50%; background: #FB7185; } .term .bar i:nth-child(2){background:#FBBF24} .term .bar i:nth-child(3){background:#34D399}
+.term pre { font: 17px/1.55 var(--mono); padding: 18px 22px; color: #CBD5E1; white-space: pre; }
+.term .ok { color: #0A0F1A; background: #4ADE80; padding: 0 6px; font-weight: 500; }
+.term .t { color: #4ADE80; } .term .dim { color: #64748B; } .term .y { color: #FDE68A; }
+.typed .ln { opacity: 0; }
+.slide.active .typed .ln { animation: ln .01s forwards; animation-delay: calc(var(--n) * 140ms + 600ms); }
+@keyframes ln { to { opacity: 1; } }
+
+/* Barras animadas */
+.bar-row { display: grid; grid-template-columns: 210px 1fr 110px; align-items: center; gap: 14px; margin: 10px 0; font-size: 19px; }
+.bar-track { height: 18px; background: rgba(148,163,184,.10); border-radius: 999px; overflow: hidden; }
+.bar-fill { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--sky), var(--indigo)); transition: width 1.4s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i,0) * 150ms + 500ms); }
+.bar-fill.slow { background: linear-gradient(90deg, #F87171, #FB923C); }
+.slide.active .bar-fill { width: var(--w); }
+
+/* SVG: trazos y flujos */
+.slide svg text { font-family: 'Fira Sans', sans-serif; }
+.draw { stroke-dasharray: var(--len, 1200); stroke-dashoffset: var(--len, 1200); }
+.slide.active .draw { animation: draw 1.6s cubic-bezier(.4,0,.2,1) forwards; animation-delay: calc(var(--i,0) * 160ms + 300ms); }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.flow { stroke-dasharray: 7 9; animation: flow 1.1s linear infinite; }
+.flow.rev { animation-direction: reverse; }
+@keyframes flow { to { stroke-dashoffset: -32; } }
+.pulse { animation: pulse 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+@keyframes pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+.float { animation: float 6s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+.svg-step { opacity: 0; transform: translateY(10px); transition: opacity .5s, transform .6s; transition-delay: calc(var(--i,0) * 380ms + 400ms); transform-box: fill-box; }
+.slide.active .svg-step { opacity: 1; transform: none; }
+
+/* Anillos de puntaje */
+.ring { width: 150px; text-align: center; }
+.ring svg { width: 150px; height: 150px; transform: rotate(-90deg); }
+.ring .bg { fill: none; stroke: rgba(148,163,184,.14); stroke-width: 10; }
+.ring .fg { fill: none; stroke: var(--green); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 389.6; stroke-dashoffset: 389.6; transition: stroke-dashoffset 1.6s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i,0) * 150ms + 400ms); }
+.ring .fg.before { stroke: #FBBF24; opacity: .55; }
+.slide.active .ring .fg { stroke-dashoffset: calc(389.6 - 389.6 * var(--v) / 100); }
+.ring .num { margin-top: -102px; height: 102px; font-size: 40px; font-weight: 700; color: #fff; }
+.ring .lbl { font: 16px var(--mono); color: var(--muted); }
+
+/* Navegación */
+#progress { position: fixed; left: 0; bottom: 0; height: 4px; background: linear-gradient(90deg, var(--sky), var(--indigo)); transition: width .5s ease; z-index: 10; box-shadow: 0 0 14px rgba(56,189,248,.6); }
+#counter { position: fixed; right: 22px; bottom: 16px; font: 14px var(--mono); color: #5B6F8C; z-index: 10; }
+#hint { position: fixed; left: 22px; bottom: 14px; font: 13px var(--mono); color: #3E5170; z-index: 10; transition: opacity 1s; }
+
+/* Portada */
+.cover { display: flex; flex-direction: column; justify-content: center; }
+.logo { width: 96px; height: 96px; border-radius: 24px; background: #0F172A; display: grid; place-items: center; border: 1px solid #23406B; box-shadow: 0 0 60px rgba(56,189,248,.35); margin-bottom: 34px; }
+.logo svg path { stroke-dasharray: 40; stroke-dashoffset: 40; }
+.slide.active .logo svg path { animation: draw 1s .3s forwards; }
+.blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .45; animation: drift 14s ease-in-out infinite; }
+@keyframes drift { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-60px, 40px) scale(1.1); } }
+.caret { display: inline-block; width: 4px; height: .9em; background: var(--sky); vertical-align: -6px; margin-left: 6px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.team { display: flex; gap: 18px; margin-top: 54px; }
+.member { display: flex; align-items: center; gap: 12px; padding: 10px 18px 10px 10px; border-radius: 999px; background: rgba(15,27,49,.8); border: 1px solid var(--line); font-size: 20px; }
+.av { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 17px; color: #04101F; }
+
+/* Timeline */
+.timeline { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding-top: 34px; }
+.timeline::before { content: ''; position: absolute; top: 12px; left: 2%; right: 2%; height: 3px; background: var(--line); }
+.timeline::after { content: ''; position: absolute; top: 12px; left: 2%; height: 3px; width: 0; background: linear-gradient(90deg, var(--sky), var(--indigo)); transition: width 2s cubic-bezier(.2,.7,.2,1) .4s; box-shadow: 0 0 12px var(--sky); }
+.slide.active .timeline::after { width: 96%; }
+.tl { position: relative; }
+.tl::before { content: ''; position: absolute; top: -30px; left: 0; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: 3px solid var(--sky); box-shadow: 0 0 14px var(--sky); }
+.tl .d { font: 600 20px var(--mono); color: var(--sky); margin-bottom: 6px; }
+.tl p { font-size: 19px; }
+
+/* Historias */
+.hu .tag { font: 500 15px var(--mono); color: var(--sky); margin-bottom: 10px; display: block; }
+.hu p { font-size: 23px; }
+.hu { padding: 30px 30px; }
+.hu em { font-style: normal; color: var(--muted); }
+
+/* Galería de pantallas */
+.gallery { position: relative; height: 640px; }
+.gallery .browser { position: absolute; width: 640px; transition: transform .5s; }
+.gallery .browser:hover { z-index: 5; transform: scale(1.04) !important; }
+
+/* Hash bcrypt */
+.hash { font: 500 30px var(--mono); letter-spacing: .02em; word-break: break-all; padding: 22px 26px; border-radius: 14px; background: #0A0F1A; border: 1px solid #22324F; }
+.hash span { transition: color .6s, background .6s; border-radius: 4px; }
+.slide.active .hash .h1 { color: #FBBF24; transition-delay: .9s; }
+.slide.active .hash .h2 { color: #FB7185; transition-delay: 1.4s; }
+.slide.active .hash .h3 { color: #38BDF8; transition-delay: 1.9s; }
+.slide.active .hash .h4 { color: #34D399; transition-delay: 2.4s; }
+.hash span { color: #475569; }
+.legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 16px; }
+.legend div { font-size: 18px; color: #C9D6E8; padding-left: 14px; border-left: 4px solid; }
+
+.flowline { display: flex; align-items: stretch; gap: 0; }
+.flowline .st { flex: 1; position: relative; }
+.flowline .st + .st { margin-left: 34px; }
+.flowline .st + .st::before { content: '→'; position: absolute; left: -30px; top: 50%; transform: translateY(-50%); color: var(--sky); font-size: 26px; }
+
+.stat { font-size: 86px; font-weight: 700; line-height: 1; letter-spacing: -.03em; }
+.stat small { font-size: 36px; color: var(--muted); font-weight: 500; }
+
+.demo-step { display: grid; grid-template-columns: 56px 1fr; gap: 16px; align-items: start; margin-bottom: 16px; }
+.demo-step .n { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font: 600 20px var(--mono); background: rgba(56,189,248,.12); border: 1px solid rgba(56,189,248,.35); color: var(--sky); }
+.demo-step p { font-size: 21px; }
+.demo-step b { display: block; font-size: 22px; margin-bottom: 2px; }
+
+.slide.center { display: flex; flex-direction: column; justify-content: center; }
+.crop { overflow: hidden; }
+.slide.center .card p, .slide.center .card li { font-size: 23px; }
+.crop img { height: 100%; object-fit: cover; object-position: top; }
+.contrib { display: grid; grid-template-columns: 210px 1fr 60px; gap: 16px; align-items: center; margin: 14px 0; font-size: 21px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
+}
+
+/* Impresión / PDF: todas las diapositivas en estado final */
+@media print {
+  @page { size: 1600px 900px; margin: 0; }
+  html, body { overflow: visible; height: auto; background: var(--bg); }
+  #stage { position: static; transform: none !important; width: 1600px; height: auto; }
+  .slide { position: relative; width: 1600px; height: 900px; opacity: 1; visibility: visible; transform: none; page-break-after: always; break-after: page; }
+  .r, .svg-step { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .bar-fill { width: var(--w) !important; transition: none !important; }
+  .ring .fg { stroke-dashoffset: calc(389.6 - 389.6 * var(--v) / 100) !important; transition: none !important; }
+  .draw { stroke-dashoffset: 0 !important; animation: none !important; }
+  .typed .ln { opacity: 1 !important; animation: none !important; }
+  .timeline::after { width: 96% !important; transition: none !important; }
+  .hash .h1 { color: #FBBF24 !important; } .hash .h2 { color: #FB7185 !important; } .hash .h3 { color: #38BDF8 !important; } .hash .h4 { color: #34D399 !important; }
+  .logo svg path { stroke-dashoffset: 0 !important; animation: none !important; }
+  #progress, #counter, #hint { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- SVG de iconos reutilizables -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4 12 14l-3-3"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.3-9.3M17 6l3 3M15 8l2 2"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 14l4-4M3.3 19a10 10 0 1 1 17.4 0"/></symbol>
+    <symbol id="i-git" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6M18 15V9a3 3 0 0 0-3-3h-4"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></symbol>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#38BDF8"/></marker>
+    <marker id="arrg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#34D399"/></marker>
+    <marker id="arri" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#818CF8"/></marker>
+    <marker id="arrm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#8FA3BF"/></marker>
+    <marker id="arrr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#FB7185"/></marker>
+  </defs>
+</svg>
+
+<!-- 1 · Portada -->
+<section class="slide cover">
+  <div class="blob" style="width:520px;height:520px;background:#38BDF8;right:-120px;top:-140px"></div>
+  <div class="blob" style="width:460px;height:460px;background:#818CF8;right:260px;bottom:-220px;animation-delay:-6s"></div>
+  <div class="logo r z"><svg width="56" height="56" viewBox="0 0 32 32"><path d="M9 21.5 14 16l-5-5.5M16.5 22h6.5" fill="none" stroke="#38BDF8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <div class="kicker r" style="--i:1">Aplicaciones Web Avanzadas · EPN · Primer Bimestre</div>
+  <h1 class="r" style="--i:2">Competency <span class="grad">Hub</span><span class="caret"></span></h1>
+  <p class="r" style="--i:3;font-size:30px;margin-top:18px;max-width:1000px">El catálogo de competencias del equipo, con chat y avisos en tiempo real, en una sola aplicación monolítica.</p>
+  <div class="r" style="--i:4;margin-top:26px;display:flex;gap:12px"><span class="chip">v1.0-b1</span><span class="chip g"><span class="dot"></span>Node.js · Express · Socket.IO · PostgreSQL</span></div>
+  <div class="team">
+    <div class="member r" style="--i:5"><span class="av" style="background:#38BDF8">JZ</span>Jhair Zambrano</div>
+    <div class="member r" style="--i:6"><span class="av" style="background:#818CF8">IP</span>Isaac Proaño</div>
+    <div class="member r" style="--i:7"><span class="av" style="background:#34D399">SR</span>Sergio Rodríguez</div>
+    <div class="member r" style="--i:8"><span class="av" style="background:#FBBF24">DM</span>Daniel Moncayo</div>
+  </div>
+</section>
+
+<!-- 2 · Problema -->
+<section class="slide">
+  <div class="kicker r">Introducción</div>
+  <h2 class="r" style="--i:1">El problema de la PYME</h2>
+  <div class="grid2" style="grid-template-columns:1.05fr .95fr;align-items:center">
+    <div>
+      <p class="r" style="--i:2;font-size:26px;margin-bottom:28px">Una <b>software factory local</b> (adaptada de nuestra TIC) arma un equipo distinto para cada proyecto. Pero las competencias que espera de su gente están <b>dispersas</b>.</p>
+      <div style="display:grid;gap:16px">
+        <div class="card r l" style="--i:3;display:flex;gap:18px;align-items:center;padding:18px 22px"><div class="icon a" style="margin:0;flex:none"><svg><use href="#i-file"/></svg></div><p>Hojas de cálculo y chats sin una <b>versión única</b> del catálogo.</p></div>
+        <div class="card r l" style="--i:4;display:flex;gap:18px;align-items:center;padding:18px 22px"><div class="icon ro" style="margin:0;flex:none"><svg><use href="#i-search"/></svg></div><p>Cuesta <b>buscar y filtrar</b> qué nivel e importancia tiene cada skill.</p></div>
+        <div class="card r l" style="--i:5;display:flex;gap:18px;align-items:center;padding:18px 22px"><div class="icon i" style="margin:0;flex:none"><svg><use href="#i-clock"/></svg></div><p>Los cambios <b>llegan tarde</b> al resto del equipo.</p></div>
+      </div>
+    </div>
+    <svg viewBox="0 0 640 520" class="r rt" style="--i:3;width:100%">
+      <g class="float">
+        <g transform="translate(20,40) rotate(-8)"><rect width="140" height="100" rx="12" fill="#0F1B31" stroke="#FBBF24" stroke-width="2"/><text x="20" y="38" fill="#FBBF24" font-size="18" font-weight="600">skills.xlsx</text><rect x="20" y="54" width="100" height="6" rx="3" fill="#2A3F63"/><rect x="20" y="70" width="70" height="6" rx="3" fill="#2A3F63"/></g>
+      </g>
+      <g class="float" style="animation-delay:-2s">
+        <g transform="translate(30,210) rotate(5)"><rect width="140" height="100" rx="12" fill="#0F1B31" stroke="#FB7185" stroke-width="2"/><text x="20" y="38" fill="#FB7185" font-size="18" font-weight="600">chat grupo</text><rect x="20" y="54" width="90" height="6" rx="3" fill="#2A3F63"/><rect x="20" y="70" width="60" height="6" rx="3" fill="#2A3F63"/></g>
+      </g>
+      <g class="float" style="animation-delay:-4s">
+        <g transform="translate(10,380) rotate(-4)"><rect width="150" height="100" rx="12" fill="#0F1B31" stroke="#818CF8" stroke-width="2"/><text x="20" y="38" fill="#818CF8" font-size="18" font-weight="600">v2_final.docx</text><rect x="20" y="54" width="100" height="6" rx="3" fill="#2A3F63"/><rect x="20" y="70" width="80" height="6" rx="3" fill="#2A3F63"/></g>
+      </g>
+      <path d="M175 95 C 290 110, 300 220, 380 250" stroke="#38BDF8" stroke-width="2.5" fill="none" class="flow" marker-end="url(#arr)"/>
+      <path d="M180 265 C 270 265, 300 262, 380 262" stroke="#38BDF8" stroke-width="2.5" fill="none" class="flow" marker-end="url(#arr)"/>
+      <path d="M175 420 C 290 410, 300 300, 380 275" stroke="#38BDF8" stroke-width="2.5" fill="none" class="flow" marker-end="url(#arr)"/>
+      <g transform="translate(390,170)">
+        <rect width="230" height="190" rx="20" fill="#0F172A" stroke="#38BDF8" stroke-width="2.5" class="pulse" style="filter:drop-shadow(0 0 22px rgba(56,189,248,.45))"/>
+        <path d="M32 52 42 42 32 32M50 54h16" stroke="#38BDF8" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <text x="30" y="98" fill="#fff" font-size="24" font-weight="700">Competency Hub</text>
+        <text x="30" y="128" fill="#8FA3BF" font-size="17">catálogo único</text>
+        <text x="30" y="152" fill="#8FA3BF" font-size="17">búsqueda + filtros</text>
+        <text x="30" y="176" fill="#34D399" font-size="17">avisos en tiempo real</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- 3 · Objetivos -->
+<section class="slide">
+  <div class="kicker r">Objetivos</div>
+  <h2 class="r" style="--i:1">Qué nos propusimos</h2>
+  <div class="card r" style="--i:2;border-color:rgba(56,189,248,.35);margin-bottom:30px;padding:28px 34px">
+    <div class="mono" style="color:var(--sky);font-size:16px;margin-bottom:8px">OBJETIVO GENERAL</div>
+    <p style="font-size:28px;color:#fff">Desarrollar una aplicación web monolítica y segura que centralice el catálogo de competencias de la PYME y comunique sus cambios al equipo en tiempo real.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px">
+    <div class="card r" style="--i:3"><div class="icon"><svg><use href="#i-lock"/></svg></div><h3>Autenticación segura</h3><p>Registro, login, rutas protegidas y recuperación de clave.</p></div>
+    <div class="card r" style="--i:4"><div class="icon i"><svg><use href="#i-list"/></svg></div><h3>CRUD de Skills</h3><p>Paginación, búsqueda, filtros y validación doble.</p></div>
+    <div class="card r" style="--i:5"><div class="icon g"><svg><use href="#i-db"/></svg></div><h3>Base de datos</h3><p>PostgreSQL con índices en los campos de búsqueda.</p></div>
+    <div class="card r" style="--i:6"><div class="icon a"><svg><use href="#i-zap"/></svg></div><h3>Tiempo real</h3><p>Chat con historial y avisos de cambios con Socket.IO.</p></div>
+    <div class="card r" style="--i:7"><div class="icon ro"><svg><use href="#i-check"/></svg></div><h3>Calidad</h3><p>Pruebas automatizadas, E2E y rendimiento medido.</p></div>
+  </div>
+</section>
+
+<!-- 4 · Cronograma y equipo -->
+<section class="slide">
+  <div class="kicker r">Planificación</div>
+  <h2 class="r" style="--i:1">Cronograma y equipo</h2>
+  <div class="timeline r" style="--i:2">
+    <div class="tl"><div class="d">21 nov</div><p>Base del monolito: Express, Docker, Prisma y autenticación completa.</p></div>
+    <div class="tl"><div class="d">22 nov</div><p>Sistema de diseño, BD de Skills, CRUD, chat y notificaciones (PR #1–#9).</p></div>
+    <div class="tl"><div class="d">23 nov</div><p>Pulido de interfaz, validación en cliente y rendimiento (PR #10–#11).</p></div>
+    <div class="tl"><div class="d">24 nov</div><p>Prueba E2E, CSP, documentación y etiqueta <code>v1.0-b1</code>.</p></div>
+  </div>
+  <div class="grid4" style="margin-top:56px">
+    <div class="card r" style="--i:4"><span class="av" style="background:#38BDF8;margin-bottom:14px">JZ</span><h3>Jhair Zambrano</h3><p class="muted">Arquitectura base, autenticación y seguridad</p></div>
+    <div class="card r" style="--i:5"><span class="av" style="background:#818CF8;margin-bottom:14px">IP</span><h3>Isaac Proaño</h3><p class="muted">Base de datos, índices y CRUD de Skills</p></div>
+    <div class="card r" style="--i:6"><span class="av" style="background:#34D399;margin-bottom:14px">SR</span><h3>Sergio Rodríguez</h3><p class="muted">Tiempo real con Socket.IO y pruebas</p></div>
+    <div class="card r" style="--i:7"><span class="av" style="background:#FBBF24;margin-bottom:14px">DM</span><h3>Daniel Moncayo</h3><p class="muted">Interfaz, validación en cliente y rendimiento</p></div>
+  </div>
+  <p class="r muted" style="--i:8;margin-top:26px;font-size:20px">Una rama por funcionalidad · 11 <i>pull requests</i> revisados antes de fusionar en <code>main</code></p>
+</section>
+
+<!-- 5 · Historias de usuario -->
+<section class="slide center">
+  <div class="kicker r">Requerimientos funcionales</div>
+  <h2 class="r" style="--i:1">Historias de usuario</h2>
+  <div class="grid3">
+    <div class="card hu r" style="--i:2"><span class="tag">HU1 · Acceso</span><p><em>Como</em> visitante <em>quiero</em> <b>registrarme e iniciar sesión</b> <em>para</em> usar el catálogo y el chat.</p></div>
+    <div class="card hu r" style="--i:3"><span class="tag">HU2 · Recuperación</span><p><em>Como</em> usuario <em>quiero</em> <b>recuperar mi clave</b> con un enlace temporal <em>para</em> no perder el acceso.</p></div>
+    <div class="card hu r" style="--i:4"><span class="tag">HU3 · Consulta</span><p><em>Como</em> líder de proyecto <em>quiero</em> <b>buscar, filtrar y paginar</b> el catálogo <em>para</em> encontrar rápido lo que necesito.</p></div>
+    <div class="card hu r" style="--i:5"><span class="tag">HU4 · Mantenimiento</span><p><em>Como</em> líder de proyecto <em>quiero</em> <b>crear, editar y eliminar</b> skills con confirmación <em>para</em> mantenerlo al día.</p></div>
+    <div class="card hu r" style="--i:6"><span class="tag">HU5 · Chat</span><p><em>Como</em> miembro del equipo <em>quiero</em> un <b>chat en tiempo real</b> con historial <em>para</em> coordinarme sin salir de la app.</p></div>
+    <div class="card hu r" style="--i:7"><span class="tag">HU6 · Avisos</span><p><em>Como</em> miembro del equipo <em>quiero</em> <b>enterarme al instante</b> cuando alguien cambia una skill.</p></div>
+  </div>
+  <p class="r muted" style="--i:8;margin-top:26px;font-size:20px">No funcionales: contraseñas con hash, CSRF, cabeceras seguras, validación en cliente y servidor, accesibilidad AA y buen rendimiento.</p>
+</section>
+
+<!-- 6 · Arquitectura del monolito -->
+<section class="slide" style="padding-top:52px">
+  <div class="kicker r">Arquitectura</div>
+  <h2 class="r" style="--i:1;margin-bottom:14px">Un monolito: un proceso, un servidor, una sesión</h2>
+  <svg viewBox="0 0 1440 690" class="r" style="--i:2;width:100%">
+    <!-- Navegadores -->
+    <g class="svg-step" style="--i:0">
+      <rect x="10" y="150" width="230" height="300" rx="20" fill="#0F1B31" stroke="#2A3F63" stroke-width="2"/>
+      <text x="125" y="192" text-anchor="middle" fill="#fff" font-size="22" font-weight="600">Navegador</text>
+      <rect x="34" y="214" width="182" height="46" rx="10" fill="#132340" stroke="#2A3F63"/><text x="125" y="243" text-anchor="middle" fill="#C9D6E8" font-size="17">HTML de EJS + CSS</text>
+      <rect x="34" y="272" width="182" height="46" rx="10" fill="#132340" stroke="#2A3F63"/><text x="125" y="301" text-anchor="middle" fill="#C9D6E8" font-size="17">form-validation.js</text>
+      <rect x="34" y="330" width="182" height="46" rx="10" fill="#132340" stroke="#34D399" stroke-opacity=".5"/><text x="125" y="359" text-anchor="middle" fill="#A7F3D0" font-size="17">socket.io-client</text>
+      <text x="125" y="420" text-anchor="middle" fill="#8FA3BF" font-size="15">cookie connect.sid</text>
+    </g>
+    <!-- Flechas HTTP y WS -->
+    <path d="M244 245 H 372" stroke="#38BDF8" stroke-width="3" class="flow" marker-end="url(#arr)"/>
+    <text x="308" y="230" text-anchor="middle" fill="#38BDF8" font-size="16" font-family="Fira Code">HTTP</text>
+    <path d="M244 355 H 372" stroke="#34D399" stroke-width="3" class="flow" marker-end="url(#arrg)" marker-start="url(#arrg)"/>
+    <text x="308" y="340" text-anchor="middle" fill="#34D399" font-size="16" font-family="Fira Code">WebSocket</text>
+    <circle r="6" fill="#38BDF8"><animateMotion dur="1.6s" repeatCount="indefinite" path="M244 245 H 372"/></circle>
+    <circle r="6" fill="#34D399"><animateMotion dur="1.3s" repeatCount="indefinite" keyPoints="0;1;0" keyTimes="0;.5;1" calcMode="linear" path="M244 355 H 372"/></circle>
+
+    <!-- Proceso Node -->
+    <rect x="380" y="10" width="760" height="670" rx="28" fill="rgba(56,189,248,.04)" stroke="#38BDF8" stroke-width="2.5" stroke-dasharray="10 8" class="pulse"/>
+    <text x="410" y="50" fill="#38BDF8" font-size="19" font-family="Fira Code" font-weight="500">node src/server.js · un solo proceso desplegable</text>
+
+    <g class="svg-step" style="--i:1">
+      <rect x="410" y="72" width="700" height="72" rx="14" fill="#0F172A" stroke="#2A3F63"/>
+      <text x="430" y="100" fill="#8FA3BF" font-size="15" font-family="Fira Code">http.createServer(app)</text>
+      <g font-size="16" font-weight="600">
+        <rect x="430" y="110" width="96" height="26" rx="13" fill="#132340"/><text x="478" y="128" text-anchor="middle" fill="#fff">Helmet</text>
+        <rect x="536" y="110" width="128" height="26" rx="13" fill="#132340"/><text x="600" y="128" text-anchor="middle" fill="#fff">compression</text>
+        <rect x="674" y="110" width="106" height="26" rx="13" fill="#132340"/><text x="727" y="128" text-anchor="middle" fill="#fff">sesión</text>
+        <rect x="790" y="110" width="84" height="26" rx="13" fill="#132340"/><text x="832" y="128" text-anchor="middle" fill="#fff">CSRF</text>
+        <rect x="884" y="110" width="132" height="26" rx="13" fill="#132340"/><text x="950" y="128" text-anchor="middle" fill="#fff">requireAuth</text>
+      </g>
+      <text x="1090" y="128" text-anchor="end" fill="#8FA3BF" font-size="18">Express 5</text>
+    </g>
+
+    <g class="svg-step" style="--i:2">
+      <text x="410" y="182" fill="#8FA3BF" font-size="15" font-family="Fira Code">src/modules/  (rutas → controlador → validación → servicio)</text>
+      <g font-size="19" font-weight="600" text-anchor="middle">
+        <rect x="410" y="196" width="160" height="92" rx="14" fill="#132340" stroke="#38BDF8"/><text x="490" y="234" fill="#fff">auth</text><text x="490" y="262" fill="#8FA3BF" font-size="14" font-weight="400">bcrypt · reset</text>
+        <rect x="590" y="196" width="160" height="92" rx="14" fill="#132340" stroke="#818CF8"/><text x="670" y="234" fill="#fff">skills</text><text x="670" y="262" fill="#8FA3BF" font-size="14" font-weight="400">CRUD · filtros</text>
+        <rect x="770" y="196" width="160" height="92" rx="14" fill="#132340" stroke="#34D399"/><text x="850" y="234" fill="#fff">chat</text><text x="850" y="262" fill="#8FA3BF" font-size="14" font-weight="400">historial</text>
+        <rect x="950" y="196" width="160" height="92" rx="14" fill="#132340" stroke="#FBBF24"/><text x="1030" y="234" fill="#fff">notifications</text><text x="1030" y="262" fill="#8FA3BF" font-size="14" font-weight="400">avisos</text>
+      </g>
+    </g>
+
+    <g class="svg-step" style="--i:3">
+      <rect x="410" y="318" width="340" height="84" rx="14" fill="#0F172A" stroke="#2A3F63"/>
+      <text x="580" y="352" text-anchor="middle" fill="#fff" font-size="20" font-weight="600">Vistas EJS</text>
+      <text x="580" y="380" text-anchor="middle" fill="#8FA3BF" font-size="15">partials: head · navbar · tabla · modal · chat</text>
+      <path d="M670 290 C 680 300, 680 306, 670 316" stroke="#818CF8" stroke-width="2" fill="none" marker-end="url(#arri)"/>
+    </g>
+
+    <g class="svg-step" style="--i:4">
+      <rect x="770" y="318" width="340" height="84" rx="14" fill="#0F172A" stroke="#FBBF24" stroke-opacity=".6"/>
+      <text x="940" y="352" text-anchor="middle" fill="#FDE68A" font-size="20" font-weight="600">skillEvents (EventEmitter)</text>
+      <text x="940" y="380" text-anchor="middle" fill="#8FA3BF" font-size="15">skill:created · skill:updated</text>
+      <path d="M690 290 C 700 330, 740 360, 768 360" stroke="#FBBF24" stroke-width="2" fill="none" class="flow" marker-end="url(#arrm)"/>
+      <path d="M1030 316 V 292" stroke="#FBBF24" stroke-width="2" class="flow" marker-end="url(#arrm)"/>
+    </g>
+
+    <g class="svg-step" style="--i:5">
+      <rect x="410" y="430" width="700" height="110" rx="16" fill="rgba(52,211,153,.06)" stroke="#34D399" stroke-width="2"/>
+      <text x="436" y="466" fill="#A7F3D0" font-size="21" font-weight="700">Socket.IO · mismo servidor HTTP</text>
+      <text x="436" y="494" fill="#C9D6E8" font-size="16" font-family="Fira Code">io.engine.use(sessionMiddleware)</text>
+      <text x="436" y="522" fill="#8FA3BF" font-size="15">handshake autenticado con la misma sesión de Express</text>
+      <rect x="850" y="452" width="112" height="32" rx="16" fill="#132340"/><text x="906" y="474" text-anchor="middle" fill="#fff" font-size="16" font-family="Fira Code">/chat</text>
+      <rect x="850" y="494" width="236" height="32" rx="16" fill="#132340"/><text x="968" y="516" text-anchor="middle" fill="#fff" font-size="16" font-family="Fira Code">/notifications</text>
+      <path d="M1030 404 C 1060 420, 1060 470, 1090 480" stroke="#34D399" stroke-width="0" fill="none"/>
+    </g>
+
+    <g class="svg-step" style="--i:6">
+      <rect x="410" y="566" width="700" height="80" rx="14" fill="#0F172A" stroke="#2A3F63"/>
+      <text x="436" y="600" fill="#fff" font-size="20" font-weight="600">Prisma ORM</text>
+      <text x="436" y="628" fill="#8FA3BF" font-size="15">consultas parametrizadas · migraciones</text>
+      <text x="1086" y="600" text-anchor="end" fill="#fff" font-size="20" font-weight="600">connect-pg-simple</text>
+      <text x="1086" y="628" text-anchor="end" fill="#8FA3BF" font-size="15">sesiones en la BD</text>
+    </g>
+
+    <!-- Base de datos -->
+    <path d="M1112 606 H 1218" stroke="#818CF8" stroke-width="3" class="flow" marker-end="url(#arri)"/>
+    <circle r="6" fill="#818CF8"><animateMotion dur="1.5s" repeatCount="indefinite" path="M1112 606 H 1218"/></circle>
+    <g class="svg-step" style="--i:7">
+      <g transform="translate(1226,300)">
+        <ellipse cx="100" cy="30" rx="100" ry="30" fill="#132340" stroke="#818CF8" stroke-width="2.5"/>
+        <path d="M0 30 V 330 C 0 370, 200 370, 200 330 V 30" fill="#0F1B31" stroke="#818CF8" stroke-width="2.5"/>
+        <ellipse cx="100" cy="30" rx="100" ry="30" fill="#1A2B4D" stroke="#818CF8" stroke-width="2.5"/>
+        <text x="100" y="94" text-anchor="middle" fill="#fff" font-size="22" font-weight="700">PostgreSQL 16</text>
+        <text x="100" y="120" text-anchor="middle" fill="#8FA3BF" font-size="15">Docker</text>
+        <g font-family="Fira Code" font-size="15" fill="#C9D6E8" text-anchor="middle">
+          <text x="100" y="168">users</text><text x="100" y="196">skills</text><text x="100" y="224">chat_messages</text><text x="100" y="252">password_reset_</text><text x="100" y="272">tokens</text><text x="100" y="300">user_sessions</text>
+        </g>
+      </g>
+    </g>
+  </svg>
+</section>
+
+<!-- 7 · Modelo de datos e índices -->
+<section class="slide">
+  <div class="kicker r">Persistencia</div>
+  <h2 class="r" style="--i:1">Modelo de datos e índices</h2>
+  <div class="grid2" style="grid-template-columns:1.05fr .95fr;gap:40px">
+    <svg viewBox="0 0 720 560" class="r" style="--i:2;width:100%">
+      <g font-family="Fira Code" font-size="15">
+        <g class="svg-step" style="--i:0">
+          <rect x="250" y="10" width="220" height="150" rx="14" fill="#0F1B31" stroke="#38BDF8" stroke-width="2"/>
+          <rect x="250" y="10" width="220" height="40" rx="14" fill="#38BDF8"/><rect x="250" y="36" width="220" height="14" fill="#38BDF8"/>
+          <text x="360" y="37" text-anchor="middle" fill="#04101F" font-weight="600" font-size="18">users</text>
+          <text x="270" y="78" fill="#FDE68A">id PK</text><text x="270" y="102" fill="#C9D6E8">email UNIQUE</text><text x="270" y="126" fill="#C9D6E8">password_hash</text><text x="270" y="150" fill="#8FA3BF">name · role</text>
+        </g>
+        <g class="svg-step" style="--i:1">
+          <rect x="0" y="300" width="230" height="170" rx="14" fill="#0F1B31" stroke="#FB7185" stroke-width="2"/>
+          <rect x="0" y="300" width="230" height="40" rx="14" fill="#FB7185"/><rect x="0" y="326" width="230" height="14" fill="#FB7185"/>
+          <text x="115" y="327" text-anchor="middle" fill="#04101F" font-weight="600" font-size="16">password_reset_tokens</text>
+          <text x="16" y="368" fill="#C9D6E8">token_hash UNIQUE</text><text x="16" y="392" fill="#C9D6E8">user_id FK</text><text x="16" y="416" fill="#C9D6E8">expires_at</text><text x="16" y="440" fill="#C9D6E8">used</text>
+        </g>
+        <g class="svg-step" style="--i:2">
+          <rect x="250" y="300" width="220" height="250" rx="14" fill="#0F1B31" stroke="#818CF8" stroke-width="2"/>
+          <rect x="250" y="300" width="220" height="40" rx="14" fill="#818CF8"/><rect x="250" y="326" width="220" height="14" fill="#818CF8"/>
+          <text x="360" y="327" text-anchor="middle" fill="#04101F" font-weight="600" font-size="18">skills</text>
+          <text x="266" y="368" fill="#C9D6E8">nombre UNIQUE</text><text x="266" y="392" fill="#C9D6E8">categoria ENUM</text><text x="266" y="416" fill="#C9D6E8">nivel_esperado 1–5</text><text x="266" y="440" fill="#C9D6E8">importancia ENUM</text><text x="266" y="464" fill="#C9D6E8">descripcion</text><text x="266" y="488" fill="#C9D6E8">created_by_id FK</text>
+          <text x="266" y="530" fill="#34D399" font-size="13">GIN trigramas · (cat, imp)</text>
+        </g>
+        <g class="svg-step" style="--i:3">
+          <rect x="490" y="300" width="230" height="200" rx="14" fill="#0F1B31" stroke="#34D399" stroke-width="2"/>
+          <rect x="490" y="300" width="230" height="40" rx="14" fill="#34D399"/><rect x="490" y="326" width="230" height="14" fill="#34D399"/>
+          <text x="605" y="327" text-anchor="middle" fill="#04101F" font-weight="600" font-size="18">chat_messages</text>
+          <text x="506" y="368" fill="#C9D6E8">content ≤ 500</text><text x="506" y="392" fill="#C9D6E8">room</text><text x="506" y="416" fill="#C9D6E8">user_id FK</text><text x="506" y="440" fill="#C9D6E8">created_at</text>
+          <text x="506" y="480" fill="#34D399" font-size="13">índice (room, created_at)</text>
+        </g>
+      </g>
+      <path d="M300 162 C 300 230, 115 230, 115 298" stroke="#FB7185" stroke-width="2.5" fill="none" class="draw" style="--len:400;--i:4"/>
+      <path d="M360 162 V 298" stroke="#818CF8" stroke-width="2.5" fill="none" class="draw" style="--len:200;--i:5"/>
+      <path d="M420 162 C 420 230, 605 230, 605 298" stroke="#34D399" stroke-width="2.5" fill="none" class="draw" style="--len:400;--i:6"/>
+      <g font-size="14" fill="#8FA3BF"><text x="140" y="222">1 : N</text><text x="368" y="236">0..1 : N</text><text x="540" y="222">1 : N</text></g>
+    </svg>
+    <div>
+      <h3 class="r" style="--i:3">¿Cuánto ayudan los índices?</h3>
+      <p class="r muted" style="--i:3;font-size:19px;margin-bottom:18px">100 000 skills sintéticas · <code>EXPLAIN ANALYZE</code> · mediana de 3 corridas</p>
+      <div class="r" style="--i:4">
+        <p style="font-size:20px;margin-bottom:4px"><b>Búsqueda</b> <code>ILIKE '%texto%'</code> · GIN de trigramas</p>
+        <div class="bar-row"><span class="muted">sin índice</span><div class="bar-track"><div class="bar-fill slow" style="--w:81%;--i:0"></div></div><span class="mono">61,1 ms</span></div>
+        <div class="bar-row"><span class="muted">con índice</span><div class="bar-track"><div class="bar-fill" style="--w:3.2%;--i:1"></div></div><span class="mono" style="color:var(--green)">2,4 ms</span></div>
+      </div>
+      <div class="r" style="--i:5;margin-top:18px">
+        <p style="font-size:20px;margin-bottom:4px"><b>Filtro + búsqueda</b> combinados</p>
+        <div class="bar-row"><span class="muted">sin índice</span><div class="bar-track"><div class="bar-fill slow" style="--w:100%;--i:2"></div></div><span class="mono">75,1 ms</span></div>
+        <div class="bar-row"><span class="muted">con índice</span><div class="bar-track"><div class="bar-fill" style="--w:4.1%;--i:3"></div></div><span class="mono" style="color:var(--green)">3,1 ms</span></div>
+      </div>
+      <div class="r" style="--i:6;margin-top:18px">
+        <p style="font-size:20px;margin-bottom:4px"><b>Total de páginas</b> por categoría + importancia</p>
+        <div class="bar-row"><span class="muted">sin índice</span><div class="bar-track"><div class="bar-fill slow" style="--w:13.8%;--i:4"></div></div><span class="mono">10,4 ms</span></div>
+        <div class="bar-row"><span class="muted">con índice</span><div class="bar-track"><div class="bar-fill" style="--w:6.8%;--i:5"></div></div><span class="mono" style="color:var(--green)">5,1 ms</span></div>
+      </div>
+      <div class="card r" style="--i:7;margin-top:22px;padding:16px 22px;display:flex;gap:24px;align-items:center">
+        <div class="stat grad">≈25×</div><p style="font-size:19px">más rápida la búsqueda: un B-tree no sirve cuando el patrón empieza con <code>%</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · Pantallas -->
+<section class="slide">
+  <div class="kicker r">Interfaz</div>
+  <h2 class="r" style="--i:1;margin-bottom:18px">Pantallas implementadas</h2>
+  <div class="gallery">
+    <div class="browser r" style="--i:2;left:0;top:10px;transform:rotate(-2deg)"><div class="bar"><i></i><i></i><i></i><span>localhost:3000/auth/login</span></div><img src="img/login.jpg" alt="Pantalla de inicio de sesión"></div>
+    <div class="browser r" style="--i:3;left:540px;top:0;width:620px;transform:rotate(1.5deg)"><div class="bar"><i></i><i></i><i></i><span>localhost:3000/skills</span></div><img src="img/skills-listado.jpg" alt="Catálogo de skills"></div>
+    <div class="browser r" style="--i:4;left:110px;top:300px;width:600px;transform:rotate(1deg)"><div class="bar"><i></i><i></i><i></i><span>localhost:3000/dashboard</span></div><img src="img/dashboard.jpg" alt="Pantalla principal"></div>
+    <div class="browser r" style="--i:5;left:790px;top:330px;width:620px;transform:rotate(-1.5deg)"><div class="bar"><i></i><i></i><i></i><span>localhost:3000/skills?q=Docker</span></div><img src="img/skills-modal-eliminar.jpg" alt="Modal para confirmar la eliminación"></div>
+  </div>
+  <div class="r" style="--i:6;position:absolute;right:84px;top:64px;display:flex;gap:10px">
+    <span class="chip">navbar con enlace activo</span><span class="chip">responsive 375 px</span><span class="chip g">WCAG AA</span>
+  </div>
+</section>
+
+<!-- 9 · Validación en cliente y servidor -->
+<section class="slide">
+  <div class="kicker r">Validación</div>
+  <h2 class="r" style="--i:1">Validación en el cliente… y siempre en el servidor</h2>
+  <div class="grid2" style="grid-template-columns:1.25fr .75fr;gap:40px;align-items:start">
+    <div class="browser r l" style="--i:2"><div class="bar"><i></i><i></i><i></i><span>localhost:3000/skills/nueva</span></div><img src="img/skills-form-validacion.jpg" alt="Formulario con errores de validación"></div>
+    <div>
+      <div class="card r rt" style="--i:3;margin-bottom:18px">
+        <h3><span style="color:var(--sky)">Cliente</span> · form-validation.js</h3>
+        <p>Lee las <b>mismas reglas</b> del servidor desde los atributos HTML, muestra el error junto al campo, un resumen enfocable y evita el doble envío.</p>
+      </div>
+      <div class="card r rt" style="--i:4;margin-bottom:18px">
+        <h3><span style="color:var(--green)">Servidor</span> · express-validator</h3>
+        <p>Si alguien salta el JavaScript, responde <b>400</b> con mensajes por campo. Nombre único sin distinguir mayúsculas.</p>
+      </div>
+      <div class="card r rt" style="--i:5">
+        <h3><span style="color:var(--indigo)">Base de datos</span> · última defensa</h3>
+        <p><code>CHECK</code> de nivel 1–5 y longitudes, enums y <code>UNIQUE</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · Seguridad: contraseñas y sesiones -->
+<section class="slide center">
+  <div class="kicker r">Seguridad · 1/2</div>
+  <h2 class="r" style="--i:1">Contraseñas y sesiones</h2>
+  <p class="r" style="--i:2;margin-bottom:14px">Así se guarda una contraseña en <code>users.password_hash</code> (ejemplo con la clave <i>MiClave2026</i>):</p>
+  <div class="hash r" style="--i:2;font-size:36px"><span class="h1">$2b$</span><span class="h2">12$</span><span class="h3">f67MEWIOrLug71rSaGaj3u</span><span class="h4">TBAhIPpa5iIsnpSv4mLWdURCWdqrqwS</span></div>
+  <div class="legend r" style="--i:3">
+    <div style="border-color:#FBBF24"><b>$2b$</b><br>algoritmo bcrypt</div>
+    <div style="border-color:#FB7185"><b>12</b><br>costo: 2¹² rondas</div>
+    <div style="border-color:#38BDF8"><b>22 caracteres</b><br>sal aleatoria única</div>
+    <div style="border-color:#34D399"><b>31 caracteres</b><br>hash resultante</div>
+  </div>
+  <div class="grid3" style="margin-top:36px">
+    <div class="card r" style="--i:5"><div class="icon"><svg><use href="#i-key"/></svg></div><h3>Mismo mensaje siempre</h3><p>«Credenciales incorrectas»: no revela si el correo existe.</p></div>
+    <div class="card r" style="--i:6"><div class="icon i"><svg><use href="#i-db"/></svg></div><h3>Sesión en PostgreSQL</h3><p>Cookie <code>HttpOnly</code> + <code>SameSite=Lax</code> (+ <code>Secure</code> en producción). <code>regenerate()</code> al iniciar evita la fijación de sesión.</p></div>
+    <div class="card r" style="--i:7"><div class="icon g"><svg><use href="#i-lock"/></svg></div><h3>Rutas protegidas</h3><p><code>requireAuth</code> en <code>/dashboard</code>, <code>/skills</code> y <code>/chat</code>: sin sesión, redirige a login.</p></div>
+  </div>
+</section>
+
+<!-- 11 · Seguridad: CSRF, cabeceras, recuperación -->
+<section class="slide">
+  <div class="kicker r">Seguridad · 2/2</div>
+  <h2 class="r" style="--i:1">CSRF, cabeceras y recuperación de clave</h2>
+  <div class="grid2" style="gap:36px">
+    <div>
+      <h3 class="r" style="--i:2">Token CSRF por sesión</h3>
+      <svg viewBox="0 0 680 230" class="r" style="--i:2;width:100%;margin-bottom:10px">
+        <rect x="0" y="20" width="200" height="90" rx="14" fill="#0F1B31" stroke="#2A3F63"/><text x="100" y="56" text-anchor="middle" fill="#fff" font-size="18" font-weight="600">Formulario</text><text x="100" y="84" text-anchor="middle" fill="#BAE6FD" font-size="15" font-family="Fira Code">_csrf = a91f…</text>
+        <rect x="0" y="130" width="200" height="90" rx="14" fill="#0F1B31" stroke="#2A3F63"/><text x="100" y="166" text-anchor="middle" fill="#fff" font-size="18" font-weight="600">Sesión</text><text x="100" y="194" text-anchor="middle" fill="#BAE6FD" font-size="15" font-family="Fira Code">csrfToken = a91f…</text>
+        <path d="M202 65 C 260 65, 250 120, 290 120" stroke="#38BDF8" stroke-width="2.5" fill="none" class="flow" marker-end="url(#arr)"/>
+        <path d="M202 175 C 260 175, 250 120, 290 120" stroke="#38BDF8" stroke-width="2.5" fill="none" class="flow" marker-end="url(#arr)"/>
+        <rect x="296" y="88" width="190" height="64" rx="32" fill="#132340" stroke="#38BDF8"/><text x="391" y="127" text-anchor="middle" fill="#fff" font-size="16" font-family="Fira Code">timingSafeEqual</text>
+        <path d="M488 104 L 540 60" stroke="#34D399" stroke-width="2.5" marker-end="url(#arrg)"/><path d="M488 136 L 540 180" stroke="#FB7185" stroke-width="2.5" marker-end="url(#arrr)"/>
+        <rect x="546" y="34" width="130" height="50" rx="12" fill="rgba(52,211,153,.12)" stroke="#34D399"/><text x="611" y="65" text-anchor="middle" fill="#A7F3D0" font-size="17" font-weight="600">continúa</text>
+        <rect x="546" y="156" width="130" height="50" rx="12" fill="rgba(251,113,133,.12)" stroke="#FB7185"/><text x="611" y="187" text-anchor="middle" fill="#FECDD3" font-size="17" font-weight="600">403</text>
+      </svg>
+      <h3 class="r" style="--i:3;margin-top:8px">Cabeceras con Helmet</h3>
+      <div class="term r" style="--i:3"><div class="bar"><i></i><i></i><i></i>&nbsp; curl -I /dashboard</div>
+<pre class="typed"><span class="ln" style="--n:0"><span class="t">Content-Security-Policy:</span> default-src 'self'; script-src 'self'; object-src 'none'…</span>
+<span class="ln" style="--n:1"><span class="t">Strict-Transport-Security:</span> max-age=31536000; includeSubDomains</span>
+<span class="ln" style="--n:2"><span class="t">X-Content-Type-Options:</span> nosniff</span>
+<span class="ln" style="--n:3"><span class="t">X-Frame-Options:</span> SAMEORIGIN</span>
+<span class="ln" style="--n:4"><span class="t">Referrer-Policy:</span> no-referrer</span>
+<span class="ln" style="--n:5"><span class="dim"># sin X-Powered-By</span></span></pre></div>
+    </div>
+    <div>
+      <h3 class="r" style="--i:4">Recuperación de clave</h3>
+      <div style="display:grid;gap:14px">
+        <div class="card r rt" style="--i:5;padding:18px 22px;display:flex;gap:16px"><div class="icon a" style="margin:0;flex:none"><svg><use href="#i-key"/></svg></div><p><b>Token aleatorio de 32 bytes</b> en el enlace. El correo se simula en la consola del servidor.</p></div>
+        <div class="card r rt" style="--i:6;padding:18px 22px;display:flex;gap:16px"><div class="icon" style="margin:0;flex:none"><svg><use href="#i-db"/></svg></div><p>En la BD solo se guarda su <b>hash SHA-256</b>: si roban la tabla, el enlace no sirve.</p></div>
+        <div class="card r rt" style="--i:7;padding:18px 22px;display:flex;gap:16px"><div class="icon i" style="margin:0;flex:none"><svg><use href="#i-clock"/></svg></div><p><b>Caduca en 15 minutos.</b> Pasado ese tiempo, el formulario responde 400.</p></div>
+        <div class="card r rt" style="--i:8;padding:18px 22px;display:flex;gap:16px"><div class="icon g" style="margin:0;flex:none"><svg><use href="#i-check"/></svg></div><p><b>Un solo uso:</b> una transacción cambia la clave y marca <code>used = true</code>.</p></div>
+        <p class="r muted" style="--i:9;font-size:18px">Además: Prisma usa consultas parametrizadas (sin inyección SQL) y EJS escapa todo lo que muestra (sin XSS).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 · WebSocket handshake -->
+<section class="slide" style="padding-top:50px">
+  <div class="kicker r">Tiempo real</div>
+  <h2 class="r" style="--i:1;margin-bottom:10px">Cómo se conecta Socket.IO sobre WebSocket</h2>
+  <svg viewBox="0 0 1440 700" class="r" style="--i:2;width:100%">
+    <!-- Actores -->
+    <g font-size="21" font-weight="600" text-anchor="middle">
+      <rect x="40" y="0" width="260" height="58" rx="14" fill="#132340" stroke="#38BDF8" stroke-width="2"/><text x="170" y="36" fill="#fff">Navegador</text>
+      <rect x="590" y="0" width="300" height="58" rx="14" fill="#132340" stroke="#34D399" stroke-width="2"/><text x="740" y="36" fill="#fff">Servidor (Engine.IO)</text>
+      <rect x="1140" y="0" width="260" height="58" rx="14" fill="#132340" stroke="#818CF8" stroke-width="2"/><text x="1270" y="36" fill="#fff">Sesión (PostgreSQL)</text>
+    </g>
+    <g stroke="#2A3F63" stroke-width="2" stroke-dasharray="6 8"><path d="M170 60 V 690"/><path d="M740 60 V 690"/><path d="M1270 60 V 690"/></g>
+
+    <g font-family="Fira Code" font-size="16">
+      <g class="svg-step" style="--i:0">
+        <text x="40" y="96" fill="#38BDF8" font-size="15" font-family="Fira Sans" font-weight="600">1 · HANDSHAKE HTTP</text>
+        <path d="M172 118 H 734" stroke="#38BDF8" stroke-width="2.5" marker-end="url(#arr)"/>
+        <text x="455" y="110" text-anchor="middle" fill="#E6EDF7">GET /socket.io/?EIO=4&amp;transport=polling · Cookie: connect.sid</text>
+      </g>
+      <g class="svg-step" style="--i:1">
+        <path d="M742 148 H 1264" stroke="#818CF8" stroke-width="2.5" marker-end="url(#arri)"/>
+        <text x="1003" y="140" text-anchor="middle" fill="#C7D2FE">io.engine.use(sessionMiddleware)</text>
+        <path d="M1268 176 H 746" stroke="#818CF8" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#arri)"/>
+        <text x="1003" y="168" text-anchor="middle" fill="#C7D2FE">session.user = { id, name }</text>
+      </g>
+      <g class="svg-step" style="--i:2">
+        <path d="M738 210 H 176" stroke="#34D399" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#arrg)"/>
+        <text x="455" y="202" text-anchor="middle" fill="#A7F3D0">0{"sid":"…","upgrades":["websocket"],"pingInterval":25000}</text>
+      </g>
+      <g class="svg-step" style="--i:3">
+        <text x="40" y="252" fill="#FBBF24" font-size="15" font-family="Fira Sans" font-weight="600">2 · AUTENTICACIÓN DEL NAMESPACE</text>
+        <path d="M172 272 H 734" stroke="#38BDF8" stroke-width="2.5" marker-end="url(#arr)"/>
+        <text x="455" y="264" text-anchor="middle" fill="#E6EDF7">40/chat,</text>
+        <rect x="760" y="242" width="360" height="58" rx="12" fill="rgba(251,191,36,.08)" stroke="#FBBF24"/>
+        <text x="940" y="266" text-anchor="middle" fill="#FDE68A">authenticateHandshake()</text>
+        <text x="940" y="289" text-anchor="middle" fill="#8FA3BF" font-size="14">¿hay sesión? ¿Origin del mismo host?</text>
+      </g>
+      <g class="svg-step" style="--i:4">
+        <path d="M738 326 H 176" stroke="#34D399" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#arrg)"/>
+        <text x="455" y="318" text-anchor="middle" fill="#A7F3D0">40/chat,{"sid":"…"}  ✔ aceptado</text>
+        <path d="M738 356 H 176" stroke="#FB7185" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#arrr)"/>
+        <text x="455" y="348" text-anchor="middle" fill="#FECDD3">44/chat,{"message":"No autorizado"}  ✘ sin sesión</text>
+      </g>
+      <g class="svg-step" style="--i:5">
+        <text x="40" y="400" fill="#34D399" font-size="15" font-family="Fira Sans" font-weight="600">3 · UPGRADE A WEBSOCKET</text>
+        <path d="M172 420 H 734" stroke="#38BDF8" stroke-width="2.5" marker-end="url(#arr)"/>
+        <text x="455" y="412" text-anchor="middle" fill="#E6EDF7">GET …&amp;transport=websocket · Upgrade: websocket</text>
+        <path d="M738 450 H 176" stroke="#34D399" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#arrg)"/>
+        <text x="455" y="442" text-anchor="middle" fill="#A7F3D0">101 Switching Protocols · 2probe → 3probe → 5</text>
+      </g>
+      <g class="svg-step" style="--i:6">
+        <text x="40" y="494" fill="#818CF8" font-size="15" font-family="Fira Sans" font-weight="600">4 · EVENTOS EN TIEMPO REAL (canal abierto)</text>
+        <rect x="172" y="508" width="566" height="140" rx="14" fill="rgba(52,211,153,.05)" stroke="#34D399" stroke-opacity=".5"/>
+        <path d="M180 540 H 730" stroke="#34D399" stroke-width="3" class="flow"/>
+        <path d="M180 612 H 730" stroke="#34D399" stroke-width="3" class="flow rev"/>
+        <circle r="7" fill="#34D399"><animateMotion dur="1.8s" repeatCount="indefinite" path="M180 540 H 730"/></circle>
+        <circle r="7" fill="#A7F3D0"><animateMotion dur="1.8s" begin=".9s" repeatCount="indefinite" path="M730 612 H 180"/></circle>
+        <text x="455" y="530" text-anchor="middle" fill="#E6EDF7">42/chat,13["chat:send",{"content":"Hola"}]</text>
+        <text x="455" y="576" text-anchor="middle" fill="#8FA3BF" font-size="14">ack ← 43/chat,13[{"ok":true}] · ping/pong cada 25 s</text>
+        <text x="455" y="636" text-anchor="middle" fill="#A7F3D0">chat:message · chat:users · skill:created</text>
+      </g>
+    </g>
+    <g class="svg-step" style="--i:7">
+      <rect x="800" y="508" width="600" height="140" rx="16" fill="#0F1B31" stroke="#2A3F63"/>
+      <text x="826" y="546" fill="#fff" font-size="20" font-weight="600">Respaldo y robustez</text>
+      <text x="826" y="578" fill="#C9D6E8" font-size="17">• Si un proxy bloquea WebSocket, sigue con HTTP long-polling.</text>
+      <text x="826" y="606" fill="#C9D6E8" font-size="17">• Reconexión automática con esperas crecientes.</text>
+      <text x="826" y="634" fill="#C9D6E8" font-size="17">• /chat y /notifications comparten una sola conexión.</text>
+    </g>
+  </svg>
+</section>
+
+<!-- 13 · Chat -->
+<section class="slide">
+  <div class="kicker r">Tiempo real</div>
+  <h2 class="r" style="--i:1">Chat del equipo: dos usuarios, un mismo canal</h2>
+  <div class="grid2" style="gap:30px">
+    <div class="r l" style="--i:2"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>Ventana normal · Isaac</span></div><img src="img/chat-isaac.jpg" alt="Chat visto por Isaac"></div></div>
+    <div class="r rt" style="--i:3"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>Incógnito · Sergio</span></div><img src="img/chat-sergio.jpg" alt="Chat visto por Sergio"></div></div>
+  </div>
+  <div class="grid4" style="margin-top:28px">
+    <div class="card r" style="--i:4;padding:18px 22px"><h3 style="font-size:21px">Conectados</h3><p style="font-size:18px">Una entrada por usuario, aunque tenga varias pestañas.</p></div>
+    <div class="card r" style="--i:5;padding:18px 22px"><h3 style="font-size:21px">Historial</h3><p style="font-size:18px">Se guarda en <code>chat_messages</code> y se carga al entrar.</p></div>
+    <div class="card r" style="--i:6;padding:18px 22px"><h3 style="font-size:21px">Saneamiento</h3><p style="font-size:18px">Vacío o &gt; 500 caracteres se rechaza; 5 mensajes / 5 s.</p></div>
+    <div class="card r" style="--i:7;padding:18px 22px"><h3 style="font-size:21px">Autor seguro</h3><p style="font-size:18px">Sale de la sesión, nunca de lo que envía el cliente.</p></div>
+  </div>
+</section>
+
+<!-- 14 · Notificaciones -->
+<section class="slide">
+  <div class="kicker r">Tiempo real</div>
+  <h2 class="r" style="--i:1">Avisos cuando cambia el catálogo</h2>
+  <svg viewBox="0 0 1440 200" class="r" style="--i:2;width:100%">
+    <g font-size="19" font-weight="600" text-anchor="middle">
+      <g class="svg-step" style="--i:0"><rect x="0" y="40" width="250" height="110" rx="16" fill="#132340" stroke="#818CF8" stroke-width="2"/><text x="125" y="88" fill="#fff">CRUD de skills</text><text x="125" y="118" fill="#8FA3BF" font-size="15" font-weight="400" font-family="Fira Code">crear / editar</text></g>
+      <g class="svg-step" style="--i:1"><rect x="330" y="40" width="270" height="110" rx="16" fill="#132340" stroke="#FBBF24" stroke-width="2"/><text x="465" y="88" fill="#fff">skillEvents</text><text x="465" y="118" fill="#8FA3BF" font-size="15" font-weight="400" font-family="Fira Code">EventEmitter de Node</text></g>
+      <g class="svg-step" style="--i:2"><rect x="680" y="40" width="330" height="110" rx="16" fill="#132340" stroke="#34D399" stroke-width="2"/><text x="845" y="88" fill="#fff">/notifications</text><text x="845" y="118" fill="#8FA3BF" font-size="15" font-weight="400" font-family="Fira Code">.except('user:&lt;autor&gt;')</text></g>
+      <g class="svg-step" style="--i:3"><rect x="1090" y="40" width="350" height="110" rx="16" fill="rgba(56,189,248,.08)" stroke="#38BDF8" stroke-width="2"/><text x="1265" y="88" fill="#fff">Toast en todas las páginas</text><text x="1265" y="118" fill="#8FA3BF" font-size="15" font-weight="400">de los demás usuarios</text></g>
+    </g>
+    <g stroke-width="3" fill="none">
+      <path d="M252 95 H 326" stroke="#818CF8" class="flow" marker-end="url(#arri)"/>
+      <path d="M602 95 H 676" stroke="#FBBF24" class="flow" marker-end="url(#arrm)"/>
+      <path d="M1012 95 H 1086" stroke="#34D399" class="flow" marker-end="url(#arrg)"/>
+    </g>
+    <circle r="7" fill="#FBBF24"><animateMotion dur="2.4s" repeatCount="indefinite" path="M252 95 H 1086"/></circle>
+    <text x="465" y="185" text-anchor="middle" fill="#8FA3BF" font-size="15">skill:created · skill:updated</text>
+  </svg>
+  <div class="grid2" style="grid-template-columns:1.2fr .8fr;gap:34px;margin-top:20px;align-items:center">
+    <div class="browser r l crop" style="--i:4;height:430px"><div class="bar"><i></i><i></i><i></i><span>Sergio en /skills mientras Isaac crea «Kubernetes»</span></div><img style="height:396px" src="img/notificacion-toast.jpg" alt="Toast de nueva skill"></div>
+    <div>
+      <p class="r" style="--i:5;margin-bottom:18px">El CRUD <b>no conoce</b> a Socket.IO: solo emite un evento de Node. El módulo de notificaciones lo reenvía.</p>
+      <p class="r" style="--i:6;margin-bottom:18px">Cada usuario está en su sala <code>user:&lt;id&gt;</code>, así quien hizo el cambio <b>no recibe su propio aviso</b>: ya ve el mensaje de confirmación.</p>
+      <p class="r muted" style="--i:7;font-size:20px">Resultado: cada parte se prueba por separado.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 15 · Pruebas -->
+<section class="slide">
+  <div class="kicker r">Calidad</div>
+  <h2 class="r" style="--i:1">Pruebas automatizadas y prueba E2E</h2>
+  <div class="grid2" style="grid-template-columns:1.1fr .9fr;gap:36px">
+    <div>
+      <div class="r" style="--i:2;display:flex;gap:40px;margin-bottom:22px">
+        <div><div class="stat"><span data-count="74">74</span><small>/74</small></div><p class="muted" style="font-size:19px">pruebas Jest · 5 suites</p></div>
+        <div><div class="stat grad"><span data-count="67">67</span><small>/67</small></div><p class="muted" style="font-size:19px">verificaciones E2E</p></div>
+      </div>
+      <div class="browser r l" style="--i:3;border-color:#22324F;background:#0D1117"><div class="bar"><i></i><i></i><i></i><span>npm test</span></div><img src="img/npm-test.png" alt="Salida de npm test con 74 pruebas aprobadas"></div>
+      <p class="r muted" style="--i:4;font-size:18px;margin-top:14px">Jest + Supertest + socket.io-client: validación, CRUD con BD real, autenticación y WebSocket.</p>
+    </div>
+    <div class="term r rt" style="--i:3"><div class="bar"><i></i><i></i><i></i>&nbsp; node scripts/e2e.js</div>
+<pre class="typed"><span class="ln" style="--n:0"><span class="ok">PASS</span> SignIn correcto → /dashboard</span>
+<span class="ln" style="--n:1"><span class="ok">PASS</span> Hash bcrypt en BD <span class="dim">— $2b$12$</span></span>
+<span class="ln" style="--n:2"><span class="ok">PASS</span> Token de un solo uso: reutilizarlo → 400</span>
+<span class="ln" style="--n:3"><span class="ok">PASS</span> Caducidad de 15 minutos</span>
+<span class="ln" style="--n:4"><span class="ok">PASS</span> Handshake sin sesión rechazado</span>
+<span class="ln" style="--n:5"><span class="ok">PASS</span> 2 usuarios conectados en /chat</span>
+<span class="ln" style="--n:6"><span class="ok">PASS</span> Transporte actualizado a WebSocket</span>
+<span class="ln" style="--n:7"><span class="ok">PASS</span> B recibe skill:created en tiempo real</span>
+<span class="ln" style="--n:8"><span class="ok">PASS</span> Paginación, búsqueda y filtros</span>
+<span class="ln" style="--n:9"><span class="ok">PASS</span> POST sin token CSRF → 403</span>
+<span class="ln" style="--n:10"><span class="ok">PASS</span> Content-Security-Policy activa</span>
+<span class="ln" style="--n:11"><span class="dim">…</span></span>
+<span class="ln" style="--n:12"><span class="t">TOTAL: 67/67 PASS</span></span></pre></div>
+  </div>
+  <div class="card r" style="--i:6;margin-top:22px;padding:16px 24px;display:flex;gap:16px;align-items:center;border-color:rgba(251,191,36,.4)">
+    <div class="icon a" style="margin:0;flex:none"><svg><use href="#i-spark"/></svg></div>
+    <p style="font-size:20px">La prueba E2E encontró un fallo real: la <b>Content-Security-Policy</b> estaba desactivada. Se activó y pasó de 66/67 a <b>67/67</b>.</p>
+  </div>
+</section>
+
+<!-- 16 · Rendimiento -->
+<section class="slide">
+  <div class="kicker r">Rendimiento</div>
+  <h2 class="r" style="--i:1">Lighthouse: antes → después</h2>
+  <div class="grid2" style="grid-template-columns:1.1fr .9fr;gap:40px;align-items:start">
+    <div>
+      <p class="r muted" style="--i:2;font-size:20px;margin-bottom:18px">Rendimiento en escritorio (mediana de 3 pasadas)</p>
+      <div class="r" style="--i:3;display:flex;gap:26px;justify-content:space-between">
+        <div class="ring" style="--i:0"><svg viewBox="0 0 150 150"><circle class="bg" cx="75" cy="75" r="62"/><circle class="fg" cx="75" cy="75" r="62" style="--v:100;--i:0"/></svg><div class="num" style="display:grid;place-items:center">100</div><div class="lbl">/auth/login</div><div class="lbl" style="color:#FBBF24">antes 96</div></div>
+        <div class="ring"><svg viewBox="0 0 150 150"><circle class="bg" cx="75" cy="75" r="62"/><circle class="fg" cx="75" cy="75" r="62" style="--v:100;--i:1"/></svg><div class="num" style="display:grid;place-items:center">100</div><div class="lbl">/dashboard</div><div class="lbl" style="color:#FBBF24">antes 96</div></div>
+        <div class="ring"><svg viewBox="0 0 150 150"><circle class="bg" cx="75" cy="75" r="62"/><circle class="fg" cx="75" cy="75" r="62" style="--v:100;--i:2"/></svg><div class="num" style="display:grid;place-items:center">100</div><div class="lbl">/skills</div><div class="lbl" style="color:#FBBF24">antes 96</div></div>
+        <div class="ring"><svg viewBox="0 0 150 150"><circle class="bg" cx="75" cy="75" r="62"/><circle class="fg" cx="75" cy="75" r="62" style="--v:100;--i:3"/></svg><div class="num" style="display:grid;place-items:center">100</div><div class="lbl">/chat</div><div class="lbl" style="color:#FBBF24">antes 97</div></div>
+      </div>
+      <div class="r" style="--i:5;margin-top:30px">
+        <p style="font-size:20px;margin-bottom:6px"><b>Primer contenido (FCP) en móvil</b></p>
+        <div class="bar-row" style="grid-template-columns:150px 1fr 200px"><span class="muted">/auth/login</span><div class="bar-track"><div class="bar-fill" style="--w:51%;--i:0"></div></div><span class="mono">1,89 → <b style="color:var(--green)">1,08 s</b></span></div>
+        <div class="bar-row" style="grid-template-columns:150px 1fr 200px"><span class="muted">/dashboard</span><div class="bar-track"><div class="bar-fill" style="--w:65%;--i:1"></div></div><span class="mono">2,05 → <b style="color:var(--green)">1,38 s</b></span></div>
+        <div class="bar-row" style="grid-template-columns:150px 1fr 200px"><span class="muted">/chat</span><div class="bar-track"><div class="bar-fill" style="--w:65%;--i:2"></div></div><span class="mono">2,11 → <b style="color:var(--green)">1,38 s</b></span></div>
+      </div>
+      <div class="r" style="--i:6;display:flex;gap:10px;margin-top:22px;flex-wrap:wrap">
+        <span class="chip">compresión gzip</span><span class="chip">caché de estáticos</span><span class="chip">fuentes propias</span><span class="chip g">0 peticiones externas</span>
+      </div>
+    </div>
+    <div>
+      <div class="browser r rt" style="--i:4"><div class="bar"><i></i><i></i><i></i><span>docs/rendimiento · escritorio · después</span></div><img src="img/lighthouse-despues.jpg" alt="Informe de Lighthouse después de optimizar"></div>
+      <p class="r muted" style="--i:7;font-size:18px;margin-top:14px">Accesibilidad, buenas prácticas y SEO: 100 en todas las pantallas. Punto en contra: el LCP móvil de <code>/skills</code> sube a 2,5 s por el repintado de la fuente; sigue en el rango «bueno».</p>
+    </div>
+  </div>
+</section>
+
+<!-- 17 · Demo -->
+<section class="slide">
+  <div class="kicker r">Demostración en vivo</div>
+  <h2 class="r" style="--i:1;margin-bottom:24px">Lo que vamos a mostrar</h2>
+  <div class="grid2" style="grid-template-columns:.95fr 1.05fr;gap:40px">
+    <div>
+      <div class="demo-step r l" style="--i:2"><div class="n">1</div><p><b>Rutas protegidas</b>Abrir <code>/skills</code> sin sesión → redirige al login.</p></div>
+      <div class="demo-step r l" style="--i:3"><div class="n">2</div><p><b>Login y hash en la BD</b>Ver el <code>password_hash</code> con <code>$2b$12$</code>.</p></div>
+      <div class="demo-step r l" style="--i:4"><div class="n">3</div><p><b>Recuperar clave</b>Enlace en la consola del servidor (15 min, un uso).</p></div>
+      <div class="demo-step r l" style="--i:5"><div class="n">4</div><p><b>Catálogo</b>Buscar «java», filtrar y pasar a la página 2.</p></div>
+      <div class="demo-step r l" style="--i:6"><div class="n">5</div><p><b>Validación</b>«Nueva skill» vacía: errores junto a cada campo.</p></div>
+      <div class="demo-step r l" style="--i:7"><div class="n">6</div><p><b>Chat en dos ventanas</b>Dos conectados y mensajes al instante.</p></div>
+      <div class="demo-step r l" style="--i:8"><div class="n">7</div><p><b>Aviso en tiempo real</b>Crear «Kubernetes» → toast en la otra ventana.</p></div>
+      <div class="demo-step r l" style="--i:9;margin-bottom:0"><div class="n">8</div><p><b>Eliminar con confirmación</b>Modal, «Eliminar» y mensaje de éxito.</p></div>
+    </div>
+    <div style="position:relative;height:640px">
+      <div class="browser r rt crop" style="--i:4;position:absolute;left:0;top:0;width:560px;height:330px;transform:rotate(-2deg)"><div class="bar"><i></i><i></i><i></i><span>Ventana A · normal</span></div><img src="img/chat-isaac.jpg" alt="Ventana A del chat" style="height:296px"></div>
+      <div class="browser r rt crop" style="--i:6;position:absolute;right:0;top:170px;width:560px;height:330px;transform:rotate(2deg)"><div class="bar"><i></i><i></i><i></i><span>Ventana B · incógnito</span></div><img src="img/chat-sergio.jpg" alt="Ventana B del chat" style="height:296px"></div>
+      <div class="r" style="--i:10;position:absolute;left:0;right:0;bottom:24px;display:flex;justify-content:center"><span class="chip g"><span class="dot"></span>docker compose up -d · npm run dev · localhost:3000</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 18 · Repositorio y evidencia -->
+<section class="slide center">
+  <div class="kicker r">Entrega</div>
+  <h2 class="r" style="--i:1">Repositorio y evidencia de trabajo</h2>
+  <div class="grid2" style="gap:44px">
+    <div>
+      <div class="card r" style="--i:2;padding:28px 30px;margin-bottom:22px">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px"><div class="icon" style="margin:0"><svg><use href="#i-git"/></svg></div><div><div class="mono muted" style="font-size:16px">Repositorio público</div><div style="font-size:28px;font-weight:600">github.com/Jhairzp27/competency-hub</div></div></div>
+        <div style="display:flex;gap:10px;margin-top:16px"><span class="chip">tag v1.0-b1</span><span class="chip">11 pull requests</span><span class="chip g">.env.example</span></div>
+      </div>
+      <div class="r" style="--i:3">
+        <p style="font-size:21px;margin-bottom:14px">El README incluye descripción de la PYME, stack, pasos de ejecución, variables de entorno, integrantes con roles y diagramas.</p>
+      </div>
+      <svg viewBox="0 0 720 230" class="r" style="--i:5;width:100%;margin-top:18px">
+        <text x="0" y="22" fill="#8FA3BF" font-size="16" font-family="Fira Code">flujo de trabajo</text>
+        <path d="M20 190 H 700" stroke="#38BDF8" stroke-width="4" class="draw" style="--len:700;--i:0"/>
+        <text x="20" y="222" fill="#38BDF8" font-size="16" font-family="Fira Code">main</text>
+        <path d="M80 190 C 110 190, 110 120, 150 120 H 300 C 340 120, 340 190, 370 190" stroke="#818CF8" stroke-width="3.5" fill="none" class="draw" style="--len:420;--i:1"/>
+        <path d="M200 190 C 230 190, 230 60, 270 60 H 470 C 510 60, 510 190, 540 190" stroke="#34D399" stroke-width="3.5" fill="none" class="draw" style="--len:560;--i:2"/>
+        <path d="M420 190 C 450 190, 450 120, 490 120 H 600 C 630 120, 630 190, 660 190" stroke="#FBBF24" stroke-width="3.5" fill="none" class="draw" style="--len:380;--i:3"/>
+        <g class="svg-step" style="--i:3">
+          <circle cx="190" cy="120" r="8" fill="#818CF8"/><circle cx="250" cy="120" r="8" fill="#818CF8"/>
+          <circle cx="310" cy="60" r="8" fill="#34D399"/><circle cx="380" cy="60" r="8" fill="#34D399"/><circle cx="440" cy="60" r="8" fill="#34D399"/>
+          <circle cx="530" cy="120" r="8" fill="#FBBF24"/><circle cx="580" cy="120" r="8" fill="#FBBF24"/>
+          <circle cx="370" cy="190" r="10" fill="#0B1426" stroke="#38BDF8" stroke-width="3"/><circle cx="540" cy="190" r="10" fill="#0B1426" stroke="#38BDF8" stroke-width="3"/><circle cx="660" cy="190" r="10" fill="#0B1426" stroke="#38BDF8" stroke-width="3"/>
+          <text x="150" y="108" fill="#C7D2FE" font-size="15" font-family="Fira Code">feature/skills-crud</text>
+          <text x="270" y="48" fill="#A7F3D0" font-size="15" font-family="Fira Code">feature/realtime-chat</text>
+          <text x="490" y="108" fill="#FDE68A" font-size="15" font-family="Fira Code">feature/ui-skills</text>
+          <text x="340" y="172" fill="#8FA3BF" font-size="13" font-family="Fira Code">PR #6</text><text x="512" y="172" fill="#8FA3BF" font-size="13" font-family="Fira Code">PR #8</text><text x="628" y="172" fill="#8FA3BF" font-size="13" font-family="Fira Code">PR #10</text>
+        </g>
+      </svg>
+    </div>
+    <div class="card r rt" style="--i:4">
+      <h3 style="margin-bottom:18px">Commits por integrante</h3>
+      <div class="contrib"><span>Daniel Moncayo</span><div class="bar-track"><div class="bar-fill" style="--w:100%;--i:0;background:linear-gradient(90deg,#FBBF24,#F59E0B)"></div></div><span class="mono">27</span></div>
+      <div class="contrib"><span>Isaac Proaño</span><div class="bar-track"><div class="bar-fill" style="--w:89%;--i:1;background:linear-gradient(90deg,#818CF8,#6366F1)"></div></div><span class="mono">24</span></div>
+      <div class="contrib"><span>Sergio Rodríguez</span><div class="bar-track"><div class="bar-fill" style="--w:48%;--i:2;background:linear-gradient(90deg,#34D399,#10B981)"></div></div><span class="mono">13</span></div>
+      <div class="contrib"><span>Jhair Zambrano</span><div class="bar-track"><div class="bar-fill" style="--w:37%;--i:3"></div></div><span class="mono">10</span></div>
+      <p class="muted" style="font-size:17px;margin-top:12px">Incluye los merges de los pull requests.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 19 · Uso de IA -->
+<section class="slide center">
+  <div class="kicker r">Integridad académica</div>
+  <h2 class="r" style="--i:1">Declaración de uso de IA</h2>
+  <div class="grid2" style="gap:30px">
+    <div class="card r l" style="--i:2">
+      <div class="icon i"><svg><use href="#i-spark"/></svg></div>
+      <h3>Gemini <span class="muted" style="font-weight:400">· Google</span></h3>
+      <ul style="padding-left:24px;margin-top:10px;font-size:24px"><li>Planificación de la arquitectura del monolito</li><li>Reparto de tareas entre los integrantes</li><li>Diseño inicial de autenticación y seguridad</li><li>Resolución de errores del entorno</li></ul>
+    </div>
+    <div class="card r rt" style="--i:3">
+      <div class="icon"><svg><use href="#i-spark"/></svg></div>
+      <h3>Claude <span class="muted" style="font-weight:400">· Anthropic</span></h3>
+      <ul style="padding-left:24px;margin-top:10px;font-size:24px"><li>Pruebas E2E del sistema</li><li>Revisión de calidad del código</li><li>Documentación</li><li>Estructura de la presentación</li></ul>
+    </div>
+  </div>
+  <div class="card r" style="--i:5;margin-top:30px;border-color:rgba(52,211,153,.4);display:flex;gap:20px;align-items:center">
+    <div class="icon g" style="margin:0;flex:none"><svg><use href="#i-check"/></svg></div>
+    <p style="font-size:24px">Todo el código y la documentación generados o sugeridos fueron <b>revisados, probados y comprendidos por los 4 integrantes</b>. Los commits asistidos llevan la línea <code>Co-Authored-By</code>.</p>
+  </div>
+</section>
+
+<!-- 20 · Conclusiones -->
+<section class="slide center">
+  <div class="kicker r">Cierre</div>
+  <h2 class="r" style="--i:1">Conclusiones y lecciones aprendidas</h2>
+  <div class="grid2" style="gap:30px">
+    <div>
+      <h3 class="r" style="--i:2;color:var(--sky)">Conclusiones</h3>
+      <div class="card r" style="--i:3;padding:18px 22px;margin-bottom:12px"><p>Un <b>monolito modular</b> cubre web y tiempo real con un solo despliegue y una sola sesión.</p></div>
+      <div class="card r" style="--i:4;padding:18px 22px;margin-bottom:12px"><p>La seguridad funciona por <b>capas</b>: hash, sesión, CSRF, CSP, validación doble y WebSocket autenticado.</p></div>
+      <div class="card r" style="--i:5;padding:18px 22px"><p><b>Medir</b> (EXPLAIN, Lighthouse, E2E) cambió decisiones reales del proyecto.</p></div>
+    </div>
+    <div>
+      <h3 class="r" style="--i:2;color:var(--indigo)">Lecciones aprendidas</h3>
+      <div class="card r" style="--i:6;padding:18px 22px;margin-bottom:12px"><p>Ramas por funcionalidad + pull requests evitaron pisarnos el trabajo.</p></div>
+      <div class="card r" style="--i:7;padding:18px 22px;margin-bottom:12px"><p>Las pruebas E2E encuentran lo que las unitarias no ven.</p></div>
+      <div class="card r" style="--i:8;padding:18px 22px"><p>Siguiente paso: correo real, rol de administrador y despliegue con HTTPS (<code>wss</code>).</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 21 · Gracias -->
+<section class="slide cover" style="text-align:center;align-items:center">
+  <div class="blob" style="width:560px;height:560px;background:#38BDF8;left:-160px;top:-180px"></div>
+  <div class="blob" style="width:480px;height:480px;background:#818CF8;right:-140px;bottom:-200px;animation-delay:-7s"></div>
+  <div class="logo r z"><svg width="56" height="56" viewBox="0 0 32 32"><path d="M9 21.5 14 16l-5-5.5M16.5 22h6.5" fill="none" stroke="#38BDF8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <h1 class="r" style="--i:1">¡Gracias!</h1>
+  <p class="r" style="--i:2;font-size:32px;margin-top:16px">¿Preguntas?</p>
+  <p class="r mono muted" style="--i:3;font-size:20px;margin-top:40px">github.com/Jhairzp27/competency-hub · v1.0-b1</p>
+</section>
+
+</div>
+<div id="progress"></div>
+<div id="counter"></div>
+<div id="hint">← → navegar · F pantalla completa</div>
+
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var progress = document.getElementById('progress');
+  var counter = document.getElementById('counter');
+  var current = 0;
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+
+  function countUp(el) {
+    var target = Number(el.getAttribute('data-count'));
+    var start = null;
+    function step(t) {
+      if (!start) start = t;
+      var p = Math.min((t - start) / 1200, 1);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    el.textContent = '0';
+    setTimeout(function () { requestAnimationFrame(step); }, 400);
+  }
+
+  function show(n) {
+    n = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, i) {
+      s.classList.toggle('active', i === n);
+      s.classList.toggle('prev', i < n);
+    });
+    // Reinicia las animaciones SVG/CSS que deben repetirse al volver a una diapositiva
+    slides[n].querySelectorAll('[data-count]').forEach(countUp);
+    current = n;
+    progress.style.width = ((n + 1) / slides.length * 100) + '%';
+    counter.textContent = (n + 1) + ' / ' + slides.length;
+    if (location.hash !== '#' + (n + 1)) history.replaceState(null, '', '#' + (n + 1));
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].indexOf(e.key) > -1) { e.preventDefault(); show(current + 1); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].indexOf(e.key) > -1) { e.preventDefault(); show(current - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen();
+    }
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('a')) return;
+    show(e.clientX > window.innerWidth / 3 ? current + 1 : current - 1);
+  });
+  var tx = null;
+  document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) show(current + (dx < 0 ? 1 : -1));
+    tx = null;
+  });
+
+  window.addEventListener('resize', fit);
+  fit();
+  var start = parseInt(location.hash.slice(1), 10);
+  show(isNaN(start) ? 0 : start - 1);
+  setTimeout(function () { document.getElementById('hint').style.opacity = 0; }, 5000);
+})();
+</script>
+</body>
+</html>
